@@ -5,7 +5,11 @@ angular.module('d3Directives').directive(
     ['d3', 'queue', 'topojson', function (d3, queue, topojson) {
         return {
             restrict: 'EA',
-            scope: true,
+            scope: {
+                loaded: '=',
+                us_states: '=',
+                cms_data: '='
+            },
             link: function (scope, element, attrs) {
                 var width = 960,
                     height = 600;
@@ -27,29 +31,14 @@ angular.module('d3Directives').directive(
                     .attr("width", width)
                     .attr("height", height);
 
-                var us_states = undefined;
-                var cms_data = undefined;
-
-                queue()
-                    .defer(d3.json, "app/static/us_states.json")
-                    .defer(d3.json, "app/static/cms_data.json")
-                    .await(ready);
-
                 function render() {
                     svg.append("path")
-                        .datum(topojson.feature(us_states, us_states).features)
-                        .attr("class", function(d) { return quantize(d[scope.variable])})
+                        .datum(topojson.feature(scope.us_states, scope.us_states).features)
+                        .attr("class", function(d) {
+                            var state = d.properties.name;
+                            return quantize(scope.cms_data[state][scope.variable]);
+                        })
                         .attr("d", path);
-                }
-
-                function ready(error, _us, _cms_data) {
-                    if (error) {
-                        console.error(error);
-                    }
-                    us = _us;
-                    cms_data = _cms_data;
-                    scope.variable_choices = _cms_data.column_names;
-                    scope.loaded = true;
                 }
             }
         };

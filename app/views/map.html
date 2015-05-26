@@ -4,7 +4,13 @@
             <h1 class="bg-info">Map</h1>
         </div>
         <div class="row">
-            <d3_map />
+            <d3_map us_states="us_states" cms_data="cms_data" loaded="loaded"/>
+        </div>
+        <div class="row">
+            <select ng-bind="variable">
+                <option ng-repeat="item in column_names">{{ item }}</option>
+            </select>
+            <p> {{ loaded }} </p>
         </div>
     </div>
 </div>
