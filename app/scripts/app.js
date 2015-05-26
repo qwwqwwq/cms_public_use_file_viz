@@ -17,27 +17,9 @@ App.controller('MapController', ['$scope', 'queue', 'd3',
     function($scope, queue, d3) {
         $scope.loaded = false;
         $scope.variable = undefined;
-        $scope.column_names = ["none"];
-
-        queue()
-            .defer(d3.json, "app/static/us_states.json")
-            .defer(d3.json, "app/static/cms_data.json")
-            .awaitAll(ready);
-
-        function ready(error, data) {
-            if ($scope.loaded) {
-                return;
-            }
-            if (error) {
-                console.error(error);
-            }
-            console.log(data);
-            $scope.us_states = data[0];
-            $scope.cms_data = data[1];
-            $scope.column_names = $scope.cms_data.column_names;
-            $scope.loaded = true;
-            console.log("Loaded GEO and CMS data from JSON..");
-        }
+        $scope.column_names = [];
+        $scope.year = "2006";
+        $scope.years = ["2006", "2007", "2008", "2009", "2010"];
     }
 ]);
 

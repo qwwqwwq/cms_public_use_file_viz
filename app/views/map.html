@@ -4,13 +4,13 @@
             <h1 class="bg-info">Map</h1>
         </div>
         <div class="row">
-            <d3_map us_states="us_states" cms_data="cms_data" loaded="loaded"/>
+            <d3_map variable="variable" year="year"/>
         </div>
         <div class="row">
-            <select ng-bind="variable">
-                <option ng-repeat="item in column_names">{{ item }}</option>
-            </select>
-            <p> {{ loaded }} </p>
+            <select ng-options="item for item in column_names" ng-model="variable"></select>
+        </div>
+        <div class="row">
+            <select ng-options="item for item in years" ng-model="year"></select>
         </div>
     </div>
 </div>
