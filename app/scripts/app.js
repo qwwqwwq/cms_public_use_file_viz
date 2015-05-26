@@ -15,7 +15,8 @@ var App = angular.module('App', ['d3Directives', 'ngRoute'])
 
 App.controller('MapController', ['$scope',
     function($scope) {
-
+        $scope.loaded = false;
+        $scope.variable = undefined;
     }
 ]);
 

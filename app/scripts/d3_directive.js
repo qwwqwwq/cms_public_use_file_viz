@@ -27,28 +27,29 @@ angular.module('d3Directives').directive(
                     .attr("width", width)
                     .attr("height", height);
 
+                var us_states = undefined;
+                var cms_data = undefined;
+
                 queue()
-                    .defer(d3.json, "app/static/us.json")
-                    .defer(d3.csv, "app/static/unemployment.tsv", function(d) { rateById.set(d.id, +d.rate); })
+                    .defer(d3.json, "app/static/us_states.json")
+                    .defer(d3.json, "app/static/cms_data.json")
                     .await(ready);
 
-                function ready(error, us) {
+                function render() {
+                    svg.append("path")
+                        .datum(topojson.feature(us_states, us_states).features)
+                        .attr("class", function(d) { return quantize(d[scope.variable])})
+                        .attr("d", path);
+                }
+
+                function ready(error, _us, _cms_data) {
                     if (error) {
                         console.error(error);
                     }
-
-                    svg.append("g")
-                        .attr("class", "counties")
-                        .selectAll("path")
-                        .data(topojson.feature(us, us.objects.counties).features)
-                        .enter().append("path")
-                        .attr("class", function(d) { return quantize(rateById.get(d.id)); })
-                        .attr("d", path);
-
-                    svg.append("path")
-                        .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
-                        .attr("class", "states")
-                        .attr("d", path);
+                    us = _us;
+                    cms_data = _cms_data;
+                    scope.variable_choices = _cms_data.column_names;
+                    scope.loaded = true;
                 }
             }
         };
