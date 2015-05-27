@@ -8,8 +8,6 @@ angular.module('d3Directives').directive(
             scope: true,
             link: function (scope, element, attrs) {
                 var us_states, cms_data, year, variable;
-
-
                 var state_name_map =
                 {
                     "Alabama":                               "AL",
@@ -91,10 +89,11 @@ angular.module('d3Directives').directive(
                     scope.$parent.loaded = true;
                     scope.$parent.$digest();
                     console.log("Loaded GEO and CMS data from JSON..");
+                    render("2006", "Number of People");
                 }
 
                 var width = 960,
-                    height = 600;
+                    height = 740;
 
 
                 var projection = d3.geo.albersUsa()
@@ -108,8 +107,7 @@ angular.module('d3Directives').directive(
                     d3.select("svg").remove();
                     return d3.select("d3_map").append("svg")
                         .attr("width", width)
-                        .attr("height", height)
-                        .append("g");
+                        .attr("height", height);
                 }
 
                 function render(year, variable) {
@@ -130,7 +128,7 @@ angular.module('d3Directives').directive(
                         .domain(d3.extent(raw_values, function(x) {
                             return x[variable]
                         }))
-                        .range(0, 240);
+                        .range([0, width]);
 
                     var svg = initalizeSvg();
 
@@ -138,7 +136,8 @@ angular.module('d3Directives').directive(
                         .scale(scale)
                         .orient("bottom")
                         .tickSize(13)
-                        .tickFormat(d3.format("+.0f"));
+                        .tickFormat(d3.format("03e"))
+                        ;
 
                     function pair(array) {
                         return array.slice(1).map(function(b, i) {
@@ -146,27 +145,36 @@ angular.module('d3Directives').directive(
                         });
                     }
 
-                    console.log(pair(scale.ticks(10)));
+                    var legend = svg.append("g")
+                        .attr("class", "legend")
+                        .attr("transform", "translate(0," + (height - 60) + ")");
 
                     // legend
-                    svg.selectAll("rect")
+                    legend.selectAll("rect")
+                        .append("g")
                         .data(pair(scale.ticks(10)))
                         .enter().append("rect")
                         .attr("height", 8)
                         .attr("x", function(d) {
                             return scale(d[0]);
                         })
-                        .attr("width", function(d) { return scale(d[1]) - scale(d[0]); })
+                        .attr("width", function(d) {
+                            return scale(d[1]) - scale(d[0]);
+                        })
                         .style("fill", function(d) { return color(d[0]); });
 
                     // legend
-                    svg.call(xAxis).append("text")
+                    legend.call(xAxis)
+                        .append("text")
                         .attr("class", "caption")
-                        .attr("y", -6)
+                        .attr("y", -12)
+                        .attr("x", 90)
                         .text(variable);
 
                     // map
-                    svg.attr("class", "states")
+                    svg.append("g")
+                        .attr("transform", "translate(0,-80)")
+                        .attr("class", "states")
                         .selectAll("path")
                         .data(topojson.feature(us_states, us_states.objects.states).features)
                         .enter()
