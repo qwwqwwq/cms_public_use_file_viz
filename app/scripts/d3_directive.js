@@ -7,23 +7,20 @@ angular.module('d3Directives').directive(
             restrict: 'EA',
             scope: true,
             link: function (scope, element, attrs) {
-                var us_states, cms_data, year, variable;
+                var us_states, cms_data;
                 var state_name_map =
                 {
                     "Alabama":                               "AL",
                     "Alaska":                                "AK",
-                    "American Samoa":                        "AS",
                     "Arizona":                               "AZ",
                     "Arkansas":                              "AR",
                     "California":                            "CA",
                     "Colorado":                              "CO",
                     "Connecticut":                           "CT",
                     "Delaware":                              "DE",
-                    "District Of Columbia":                  "DC",
-                    "Federated States Of Micronesia":                   "FM",
+                    "District of Columbia":                  "DC",
                     "Florida":                                          "FL",
                     "Georgia":                                          "GA",
-                    "Guam":                                             "GU",
                     "Hawaii":                                           "HI",
                     "Idaho":                                            "ID",
                     "Illinois":                                         "IL",
@@ -33,7 +30,6 @@ angular.module('d3Directives').directive(
                     "Kentucky":                                         "KY",
                     "Louisiana":                                        "LA",
                     "Maine":                                            "ME",
-                    "Marshall Islands":                                 "MH",
                     "Maryland":                                         "MD",
                     "Massachusetts":                                    "MA",
                     "Michigan":                                         "MI",
@@ -49,13 +45,10 @@ angular.module('d3Directives').directive(
                     "New York":                                         "NY",
                     "North Carolina":                                   "NC",
                     "North Dakota":                                     "ND",
-                    "Northern Mariana Islands":                         "MP",
                     "Ohio":                                             "OH",
                     "Oklahoma":                                         "OK",
                     "Oregon":                                           "OR",
-                    "Palau":                                            "PW",
                     "Pennsylvania":                                     "PA",
-                    "Puerto Rico":                                      "PR",
                     "Rhode Island":                                     "RI",
                     "South Carolina":                                   "SC",
                     "South Dakota":                                     "SD",
@@ -63,7 +56,6 @@ angular.module('d3Directives').directive(
                     "Texas":                                            "TX",
                     "Utah":                                             "UT",
                     "Vermont":                                          "VT",
-                    "Virgin Islands":                                   "VI",
                     "Virginia":                                         "VA",
                     "Washington":                                       "WA",
                     "West Virginia":                                    "WV",
@@ -89,7 +81,7 @@ angular.module('d3Directives').directive(
                     scope.$parent.loaded = true;
                     scope.$parent.$digest();
                     console.log("Loaded GEO and CMS data from JSON..");
-                    render("2006", "Number of People");
+                    render(scope.$parent.year, scope.$parent.variable, scope.$parent.selected_enrollment_types);
                 }
 
                 var width = 960,
@@ -110,24 +102,64 @@ angular.module('d3Directives').directive(
                         .attr("height", height);
                 }
 
-                function render(year, variable) {
+                function getDatum(year, enrollment_types, state_full, variable) {
+                    if (!(state_full in state_name_map)) {
+                        console.error(state_full + " not found in state map");
+                    }
+                    var state = state_name_map[state_full];
+
+                    if (!(year in cms_data)) {
+                        return 0.0;
+                    }
+
+                    var output = 0.0;
+                    for (var i = 0; i < enrollment_types.length; i++) {
+                        if (!(year in cms_data)) {
+                            console.error(year + " not found in data");
+                        }
+
+                        if (!(enrollment_types[i] in cms_data[year])) {
+                            console.error(enrollment_types[i] + " not found in year " + year);
+                        }
+
+                        if (!(state in cms_data[year][enrollment_types[i]])) {
+                            console.error(state  + "(" + state_full + ") not found in year " + year + " type " + enrollment_types[i]);
+                        }
+
+                        if (!(variable in cms_data[year][enrollment_types[i]][state])) {
+                            console.error(state + " not found in year " + year + " type " + enrollment_types[i] + " variable " + variable);
+                        }
+
+                        output += cms_data[year][enrollment_types[i]][state][variable];
+                    }
+                    return output;
+                }
+
+                function getAllForVariable(year, enrollment_types, variable) {
+                    var states = d3.keys(state_name_map);
+                    var output = [];
+                    for (var i = 0; i < states.length; i++) {
+                        output.push(getDatum(year, enrollment_types, states[i], variable));
+                    }
+                    return output;
+                }
+
+                function render(year, variable, selected_enrollment_types) {
                     if (!scope.$parent.loaded) {
                         return;
                     }
                     console.log("Rendering " + variable);
 
-                    var raw_values = d3.values(cms_data[year]);
+                    var all_values = getAllForVariable(year, selected_enrollment_types, variable);
+
+                    console.log("Range is " + d3.extent(all_values));
 
                     var color = d3.scale.linear()
-                        .domain(d3.extent(raw_values, function(x) {
-                            return x[variable]
-                        }))
+                        .domain(d3.extent(all_values))
                         .range(["#F7FBFF", "#08306B"]);
 
                     var scale = d3.scale.linear()
-                        .domain(d3.extent(raw_values, function(x) {
-                            return x[variable]
-                        }))
+                        .domain(d3.extent(all_values))
                         .range([0, width]);
 
                     var svg = initalizeSvg();
@@ -180,24 +212,21 @@ angular.module('d3Directives').directive(
                         .enter()
                         .append("path")
                         .attr("fill", function(d) {
-                            var state = state_name_map[d.properties.name];
-                            if (year in cms_data && state in cms_data[year] && variable in cms_data[year][state]) {
-                                return color(cms_data[year][state][variable]);
-                            } else {
-                                return "#000000";
-                            }
+                            return color(getDatum(year, selected_enrollment_types, d.properties.name, variable));
                         })
                         .attr("d", path);
                 }
 
                 scope.$watch(attrs.variable, function (newVals, oldVals) {
-                    variable = newVals;
-                    return render(year, variable);
+                    render(scope.$parent.year, scope.$parent.variable, scope.$parent.selected_enrollment_types);
                 }, true);
 
                 scope.$watch(attrs.year, function (newVals, oldVals) {
-                    year = newVals;
-                    return render(year, variable);
+                    render(scope.$parent.year, scope.$parent.variable, scope.$parent.selected_enrollment_types);
+                }, true);
+
+                scope.$watch(attrs.selected_enrollment_types, function (newVals, oldVals) {
+                    render(scope.$parent.year, scope.$parent.variable, scope.$parent.selected_enrollment_types);
                 }, true);
             }
         };

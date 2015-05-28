@@ -20,6 +20,8 @@ App.controller('MapController', ['$scope', 'queue', 'd3',
         $scope.column_names = [];
         $scope.year = "2006";
         $scope.years = ["2006", "2007", "2008", "2009", "2010"];
+        $scope.selected_enrollment_types = ['Full Benefit'];
+        $scope.enrollment_types = ['Full Benefit', 'Partial Benefit', 'Medicare Only', 'Medicaid Only (Disability)'];
     }
 ]);
 

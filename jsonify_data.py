@@ -3,19 +3,92 @@ import pandas
 import json
 
 
-def main():
+TYPES = ['Full Benefit',
+         'Partial Benefit',
+         'Medicare Only',
+         'Medicaid Only (Disability)']
+
+SHEETS = ['PUF_2006', 'PUF_2007', 'PUF_2008', 'PUF_2009', 'PUF_2010']
+
+STATES = [
+                "AL",
+             "AK",
+             "AZ",
+             "AR",
+             "CA",
+             "CO",
+             "CT",
+             "DE",
+             "DC",
+                        "FL",
+                        "GA",
+                        "HI",
+                        "ID",
+                        "IL",
+                        "IN",
+                        "IA",
+                        "KS",
+                        "KY",
+                        "LA",
+                        "ME",
+                        "MD",
+                        "MA",
+                        "MI",
+                        "MN",
+                        "MS",
+                        "MO",
+                        "MT",
+                        "NE",
+                        "NV",
+                        "NH",
+                        "NJ",
+                        "NM",
+                        "NY",
+                        "NC",
+                        "ND",
+                        "OH",
+                        "OK",
+                        "OR",
+                        "PA",
+                        "RI",
+                        "SC",
+                        "SD",
+                        "TN",
+                        "TX",
+                        "UT",
+                        "VT",
+                        "VA",
+                        "WA",
+                        "WV",
+                        "WI",
+                         "WY"
+]
+
+def load_sheet(sheet):
+    year = sheet.split("_")[-1]
     print 'Loading from MMLEADS_PUF_2006-2010.xlsx..'
-    sheets = [('2006', pandas.read_excel('MMLEADS_PUF_2006-2010.xlsx', 'PUF_2006', skiprows=1, index_col=0)),
-              ('2007', pandas.read_excel('MMLEADS_PUF_2006-2010.xlsx', 'PUF_2007', skiprows=1, index_col=0)),
-              ('2008', pandas.read_excel('MMLEADS_PUF_2006-2010.xlsx', 'PUF_2008', skiprows=1, index_col=0)),
-              ('2009', pandas.read_excel('MMLEADS_PUF_2006-2010.xlsx', 'PUF_2009', skiprows=1, index_col=0)),
-              ('2010', pandas.read_excel('MMLEADS_PUF_2006-2010.xlsx', 'PUF_2010', skiprows=1, index_col=0))]
+    df = pandas.read_excel('MMLEADS_PUF_2006-2010.xlsx', 'PUF_2006', skiprows=1, index_col=[0,1])
+    df = df.replace('.', 0)
+    df = df.replace('*', 0)
+    df = df[4:] # drop national stats
+    output = {}
+    for t in TYPES:
+        slice = df.xs(t, level='Number of People by Medicare-Medicaid Enrollment Type')
+        obj = {}
+        for s in STATES:
+            obj[s] = json.loads(slice.loc[s].to_json(orient='index'))
+        output[t] = obj
+    return year, output
+
+def main():
+    output = {}
+    for sheet in SHEETS:
+        output.__setitem__(*load_sheet(sheet))
     print 'Parsing JSON..'
-    obj = {x: json.loads(y.to_json(orient='index')) for (x, y) in sheets}
-    obj['column_names'] = sheets[0][1].keys().tolist()
+    output['column_names'] = output.values()[0].values()[0].values()[0].keys()
     print 'Writing app/static/cms_data.json..'
     with open('app/static/cms_data.json', 'w') as of:
-        json.dump(obj, of)
+        json.dump(output, of)
 
 
 if __name__ == '__main__':
