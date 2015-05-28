@@ -162,7 +162,7 @@ angular.module('d3Directives').directive(
 
                     var scale = d3.scale.linear()
                         .domain(d3.extent(all_values))
-                        .range([0, width]);
+                        .range([100, 600]);
 
                     var svg = initalizeSvg();
 
@@ -198,7 +198,7 @@ angular.module('d3Directives').directive(
                     // legend
                     legend.selectAll("rect")
                         .append("g")
-                        .data(pair(scale.ticks(10)))
+                        .data(pair([d3.min(all_values)].concat(scale.ticks(10)).concat([d3.max(all_values)])))
                         .enter().append("rect")
                         .attr("height", 8)
                         .attr("x", function(d) {
