@@ -18,3 +18,7 @@
     stroke: #000;
     shape-rendering: crispEdges;
 }
+
+.nav, .pagination, .carousel, .panel-title a {
+    cursor: pointer;
+}

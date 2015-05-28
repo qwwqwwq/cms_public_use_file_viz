@@ -77,11 +77,12 @@ angular.module('d3Directives').directive(
                     }
                     us_states = data[0];
                     cms_data = data[1];
-                    scope.$parent.column_names = cms_data.column_names;
+                    scope.$parent.column_names = cms_data.column_names.sort();
                     scope.$parent.loaded = true;
                     scope.$parent.$digest();
                     console.log("Loaded GEO and CMS data from JSON..");
-                    render(scope.$parent.year, scope.$parent.variable, scope.$parent.selected_enrollment_types);
+                    render(scope.$parent.year, scope.$parent.variable,
+                        getEnrollmentTypesAsArray(scope.$parent.enrollment_types));
                 }
 
                 var width = 960,
@@ -148,7 +149,8 @@ angular.module('d3Directives').directive(
                     if (!scope.$parent.loaded) {
                         return;
                     }
-                    console.log("Rendering " + variable);
+                    console.log("Rendering " + variable + " for year " + year);
+                    console.log(selected_enrollment_types);
 
                     var all_values = getAllForVariable(year, selected_enrollment_types, variable);
 
@@ -164,11 +166,23 @@ angular.module('d3Directives').directive(
 
                     var svg = initalizeSvg();
 
+                    var format;
+
+                    if (/percent/i.test(variable)) {
+                        format = d3.format(".3%")
+                    } else if (/number/i.test(variable) || /count/i.test(variable)) {
+                        format = d3.format("4s");
+                    } else if (/dollar/i.test(variable) || /payment/i.test(variable)) {
+                        format = d3.format("$.3s");
+                    } else {
+                        format = d3.format("")
+                    }
+
                     var xAxis = d3.svg.axis()
                         .scale(scale)
                         .orient("bottom")
                         .tickSize(13)
-                        .tickFormat(d3.format("03e"))
+                        .tickFormat(format)
                         ;
 
                     function pair(array) {
@@ -217,16 +231,32 @@ angular.module('d3Directives').directive(
                         .attr("d", path);
                 }
 
-                scope.$watch(attrs.variable, function (newVals, oldVals) {
-                    render(scope.$parent.year, scope.$parent.variable, scope.$parent.selected_enrollment_types);
+                function getEnrollmentTypesAsArray(enrollment_types) {
+                    var keys = d3.keys(enrollment_types);
+                    var values = d3.values(enrollment_types);
+                    var output = [];
+                    for (var i = 0; i < values.length; i++) {
+                        if (values[i]) {
+                            output.push(keys[i]);
+                        }
+                    }
+                    console.log(output);
+                    return output;
+                }
+
+                scope.$watch('variable', function (newVals, oldVals) {
+                    render(scope.$parent.year, scope.$parent.variable,
+                        getEnrollmentTypesAsArray(scope.$parent.enrollment_types));
                 }, true);
 
-                scope.$watch(attrs.year, function (newVals, oldVals) {
-                    render(scope.$parent.year, scope.$parent.variable, scope.$parent.selected_enrollment_types);
+                scope.$watch('year', function (newVals, oldVals) {
+                    render(scope.$parent.year, scope.$parent.variable,
+                        getEnrollmentTypesAsArray(scope.$parent.enrollment_types));
                 }, true);
 
-                scope.$watch(attrs.selected_enrollment_types, function (newVals, oldVals) {
-                    render(scope.$parent.year, scope.$parent.variable, scope.$parent.selected_enrollment_types);
+                scope.$watch('enrollment_types', function (newVals, oldVals) {
+                    render(scope.$parent.year, scope.$parent.variable,
+                        getEnrollmentTypesAsArray(scope.$parent.enrollment_types));
                 }, true);
             }
         };

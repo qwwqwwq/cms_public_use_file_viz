@@ -5,7 +5,7 @@ angular.module('topojson', []);
 angular.module('queue', []);
 angular.module('d3Directives', ['d3', 'queue', 'topojson']);
 
-var App = angular.module('App', ['d3Directives', 'ngRoute'])
+var App = angular.module('App', ['d3Directives', 'ngRoute', 'ui.bootstrap'])
     .config(['$routeProvider', function($routeProvider) {
         $routeProvider
             .otherwise({
@@ -20,8 +20,15 @@ App.controller('MapController', ['$scope', 'queue', 'd3',
         $scope.column_names = [];
         $scope.year = "2006";
         $scope.years = ["2006", "2007", "2008", "2009", "2010"];
-        $scope.selected_enrollment_types = ['Full Benefit'];
-        $scope.enrollment_types = ['Full Benefit', 'Partial Benefit', 'Medicare Only', 'Medicaid Only (Disability)'];
+        $scope.enrollment_types = {'Full Benefit': true,
+            'Partial Benefit': false,
+            'Medicare Only': false,
+            'Medicaid Only (Disability)': false};
+
+        $scope.update = function() {
+            console.log("update");
+            $scope.$digest();
+        }
     }
 ]);
 

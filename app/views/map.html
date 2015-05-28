@@ -4,13 +4,29 @@
             <h1 class="bg-info">Map</h1>
         </div>
         <div class="row">
-            <d3_map variable="variable" year="year" selected_enrollment_types="selected_enrollment_types"/>
+            <d3_map/>
         </div>
         <div class="row">
             <select ng-options="item for item in column_names" ng-model="variable"></select>
         </div>
         <div class="row">
             <select ng-options="item for item in years" ng-model="year"></select>
+        </div>
+        <div class="row">
+            <div class="btn-group">
+                <label class="btn btn-primary" ng-model="enrollment_types['Full Benefit']" btn-checkbox>
+                    Full Benefit
+                </label>
+                <label class="btn btn-primary" ng-model="enrollment_types['Partial Benefit']" btn-checkbox>
+                           Partial Benefit
+                </label>
+                <label class="btn btn-primary" ng-model="enrollment_types['Medicare Only']" btn-checkbox>
+                           Medicare Only
+                </label>
+                <label class="btn btn-primary" ng-model="enrollment_types['Medicaid Only (Disability)']" btn-checkbox>
+                           Medicaid Only (Disability)
+                </label>
+            </div>
         </div>
     </div>
 </div>
