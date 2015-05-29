@@ -11,67 +11,76 @@ TYPES = ['Full Benefit',
 SHEETS = ['PUF_2006', 'PUF_2007', 'PUF_2008', 'PUF_2009', 'PUF_2010']
 
 STATES = [
-                "AL",
-             "AK",
-             "AZ",
-             "AR",
-             "CA",
-             "CO",
-             "CT",
-             "DE",
-             "DC",
-                        "FL",
-                        "GA",
-                        "HI",
-                        "ID",
-                        "IL",
-                        "IN",
-                        "IA",
-                        "KS",
-                        "KY",
-                        "LA",
-                        "ME",
-                        "MD",
-                        "MA",
-                        "MI",
-                        "MN",
-                        "MS",
-                        "MO",
-                        "MT",
-                        "NE",
-                        "NV",
-                        "NH",
-                        "NJ",
-                        "NM",
-                        "NY",
-                        "NC",
-                        "ND",
-                        "OH",
-                        "OK",
-                        "OR",
-                        "PA",
-                        "RI",
-                        "SC",
-                        "SD",
-                        "TN",
-                        "TX",
-                        "UT",
-                        "VT",
-                        "VA",
-                        "WA",
-                        "WV",
-                        "WI",
-                         "WY"
+    "AL",
+    "AK",
+    "AZ",
+    "AR",
+    "CA",
+    "CO",
+    "CT",
+    "DE",
+    "DC",
+    "FL",
+    "GA",
+    "HI",
+    "ID",
+    "IL",
+    "IN",
+    "IA",
+    "KS",
+    "KY",
+    "LA",
+    "ME",
+    "MD",
+    "MA",
+    "MI",
+    "MN",
+    "MS",
+    "MO",
+    "MT",
+    "NE",
+    "NV",
+    "NH",
+    "NJ",
+    "NM",
+    "NY",
+    "NC",
+    "ND",
+    "OH",
+    "OK",
+    "OR",
+    "PA",
+    "RI",
+    "SC",
+    "SD",
+    "TN",
+    "TX",
+    "UT",
+    "VT",
+    "VA",
+    "WA",
+    "WV",
+    "WI",
+    "WY"
 ]
+
 
 def load_sheet(sheet):
     year = sheet.split("_")[-1]
     print 'Loading from MMLEADS_PUF_2006-2010.xlsx..'
-    df = pandas.read_excel('MMLEADS_PUF_2006-2010.xlsx', 'PUF_2006', skiprows=1, index_col=[0,1])
+    df = pandas.read_excel('MMLEADS_PUF_2006-2010.xlsx', 'PUF_2006', skiprows=1, index_col=[0, 1])
     df = df.replace('.', 0)
     df = df.replace('*', 0)
-    df = df[4:] # drop national stats
+    df = df.replace('<0.01%', 0.01)
+    df = df[4:]  # drop national stats
+
+    for col in df.keys().tolist():
+        if 'percent' in col.lower():
+            df[col] = df[col] / 100
+
     output = {}
+
+
     for t in TYPES:
         slice = df.xs(t, level='Number of People by Medicare-Medicaid Enrollment Type')
         obj = {}
@@ -79,6 +88,7 @@ def load_sheet(sheet):
             obj[s] = json.loads(slice.loc[s].to_json(orient='index'))
         output[t] = obj
     return year, output
+
 
 def main():
     output = {}
