@@ -1,6 +1,7 @@
 __author__ = 'jeffreyquinn'
 import pandas
 import json
+import re
 
 
 TYPES = ['Full Benefit',
@@ -76,7 +77,8 @@ def load_sheet(sheet):
 
     for col in df.keys().tolist():
         if 'percent' in col.lower():
-            df[col] = df[col] / 100
+            df[re.sub("[Pp]ercent", "Number", col)] = df['Number of People'] * df[col]
+            del df[col]
 
     output = {}
 

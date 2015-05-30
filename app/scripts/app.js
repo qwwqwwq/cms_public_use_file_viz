@@ -24,6 +24,7 @@ App.controller('MapController', ['$scope', 'queue', 'd3',
             'Partial Benefit': false,
             'Medicare Only': false,
             'Medicaid Only (Disability)': false};
+        $scope.proportion = false;
 
         $scope.update = function() {
             console.log("update");

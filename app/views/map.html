@@ -7,7 +7,17 @@
             <d3_map/>
         </div>
         <div class="row">
-            <select ng-options="item for item in column_names" ng-model="variable"></select>
+            <!-- select ng-options="item for item in column_names" ng-model="variable"></select -->
+            <!-- Split button -->
+            <div class="btn-group" dropdown is-open="status.isopen">
+                <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle ng-disabled="disabled">
+                    Button dropdown
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li ng-repeat="item in column_names">{{ item }}</li>
+                </ul>
+            </div>
         </div>
         <div class="row">
             <select ng-options="item for item in years" ng-model="year"></select>
@@ -26,6 +36,12 @@
                 <label class="btn btn-primary" ng-model="enrollment_types['Medicaid Only (Disability)']" btn-checkbox>
                     Medicaid Only (Disability)
                 </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="btn-group">
+                <label class="btn btn-primary" ng-model="proportion" btn-radio="false">Total</label>
+                <label class="btn btn-primary" ng-model="proportion" btn-radio="true">Per Enrolled</label>
             </div>
         </div>
     </div>

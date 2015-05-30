@@ -22,3 +22,11 @@
 .nav, .pagination, .carousel, .panel-title a {
     cursor: pointer;
 }
+
+.dropdown-menu {
+    width: 100%;
+}
+
+.dropdown-toggle {
+    width: 100%;
+}
