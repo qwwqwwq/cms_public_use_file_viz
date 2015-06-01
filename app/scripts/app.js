@@ -16,8 +16,8 @@ var App = angular.module('App', ['d3Directives', 'ngRoute', 'ui.bootstrap', 'dro
     }]);
 
 
-App.controller('MapController', ['$scope', 'queue', 'd3',
-    function ($scope, queue, d3) {
+App.controller('MapController', ['$scope', '$timeout', 'queue', 'd3',
+    function ($scope, $timeout, queue, d3) {
         $scope.variable_categories = {};
         $scope.categories_show = {};
         d3.json("app/static/variable_categories.json", function(data) {
@@ -43,13 +43,10 @@ App.controller('MapController', ['$scope', 'queue', 'd3',
             $scope.variable = v;
         };
 
-        $scope.show_category = function(category) {
-            $scope.categories_show[category] = true;
+        $scope.toggle_category = function(category) {
+            $scope.categories_show[category] = !$scope.categories_show[category];
         };
 
-        $scope.hide_category = function(category) {
-            $scope.categories_show[category] = false;
-        };
     }
 ]);
 

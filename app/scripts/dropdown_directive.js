@@ -1,4 +1,6 @@
-angular.module("dropdownDirective").directive('variable', [function() {
+var mod = angular.module("dropdownDirective");
+
+mod.directive('variable', [function() {
     return {
         restrict: 'E',
         replace: true,
@@ -9,6 +11,23 @@ angular.module("dropdownDirective").directive('variable', [function() {
                 })
                 .on('mouseleave',function() {
                     elm.children().removeClass('hovered-item');
+                });
+        }
+    };
+}]);
+
+
+mod.directive('category', [function() {
+    return {
+        restrict: 'E',
+        replace: true,
+        template: '<li><span class="selection-item"><b>{{category}}</b></span></li>',
+        link: function(scope, elm, attrs) {
+            elm.on('mouseenter',function() {
+                    elm.addClass('hovered-item');
+                })
+                .on('mouseleave',function() {
+                    elm.removeClass('hovered-item');
                 });
         }
     };

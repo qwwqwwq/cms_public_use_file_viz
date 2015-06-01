@@ -35,6 +35,10 @@
     cursor: pointer;
 }
 
+.scrolling-dropup {
+    overflow-y: scroll;
+}
+
 .big-button {
     width: 100%;
 }
