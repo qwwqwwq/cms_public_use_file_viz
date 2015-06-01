@@ -261,26 +261,39 @@ angular.module('d3Directives').directive(
                     return output;
                 }
 
+                function getTrueKey(obj) {
+                    var arr = d3.entries(obj);
+                    for (var i = 0; i<arr.length; i++) {
+                        if(arr[i].value) {
+                            return arr[i].key;
+                        }
+                    }
+                }
+
                 scope.$watch('variable', function (newVals, oldVals) {
-                    render(scope.$parent.year, scope.$parent.variable,
+                    render(scope.$parent.year,
+                        scope.$parent.variable,
                         getEnrollmentTypesAsArray(scope.$parent.enrollment_types),
                         scope.$parent.proportion);
                 }, true);
 
                 scope.$watch('year', function (newVals, oldVals) {
-                    render(scope.$parent.year, scope.$parent.variable,
+                    render(scope.$parent.year,
+                        scope.$parent.variable,
                         getEnrollmentTypesAsArray(scope.$parent.enrollment_types),
                         scope.$parent.proportion);
                 }, true);
 
                 scope.$watch('enrollment_types', function (newVals, oldVals) {
-                    render(scope.$parent.year, scope.$parent.variable,
+                    render(scope.$parent.year,
+                        scope.$parent.variable,
                         getEnrollmentTypesAsArray(scope.$parent.enrollment_types),
                         scope.$parent.proportion);
                 }, true);
 
                 scope.$watch('proportion', function (newVals, oldVals) {
-                    render(scope.$parent.year, scope.$parent.variable,
+                    render(scope.$parent.year,
+                        scope.$parent.variable,
                         getEnrollmentTypesAsArray(scope.$parent.enrollment_types),
                         scope.$parent.proportion);
                 }, true);

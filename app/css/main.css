@@ -23,10 +23,30 @@
     cursor: pointer;
 }
 
-.dropdown-menu {
+.dropdown-column {
+    list-style: none;
+}
+
+.hovered-item {
+    color: #749eff;
+}
+
+.selection-item {
+    cursor: pointer;
+}
+
+.big-button {
     width: 100%;
 }
 
-.dropdown-toggle {
-    width: 100%;
+.one-fifth-button {
+    width: 20%;
+}
+
+.one-fourth-button {
+    width: 25%;
+}
+
+.one-half-button {
+    width: 50%;
 }

@@ -4,40 +4,60 @@ angular.module('d3', []);
 angular.module('topojson', []);
 angular.module('queue', []);
 angular.module('d3Directives', ['d3', 'queue', 'topojson']);
+angular.module('dropdownDirective', []);
 
-var App = angular.module('App', ['d3Directives', 'ngRoute', 'ui.bootstrap'])
-    .config(['$routeProvider', function($routeProvider) {
+
+var App = angular.module('App', ['d3Directives', 'ngRoute', 'ui.bootstrap', 'dropdownDirective'])
+    .config(['$routeProvider', function ($routeProvider) {
         $routeProvider
             .otherwise({
                 redirectTo: '/'
             });
     }]);
 
+
 App.controller('MapController', ['$scope', 'queue', 'd3',
-    function($scope, queue, d3) {
+    function ($scope, queue, d3) {
+        $scope.variable_categories = {};
+        $scope.categories_show = {};
+        d3.json("app/static/variable_categories.json", function(data) {
+            $scope.variable_categories = data;
+            var arr = d3.keys(data);
+            for (var i = 0; i<arr.length; i++) {
+                $scope.categories_show[arr[i]] = false;
+            }
+        });
         $scope.loaded = false;
         $scope.variable = "Number of People";
         $scope.column_names = [];
         $scope.year = "2006";
-        $scope.years = ["2006", "2007", "2008", "2009", "2010"];
-        $scope.enrollment_types = {'Full Benefit': true,
+        $scope.enrollment_types = {
+            'Full Benefit': true,
             'Partial Benefit': false,
             'Medicare Only': false,
-            'Medicaid Only (Disability)': false};
+            'Medicaid Only (Disability)': false
+        };
         $scope.proportion = false;
 
-        $scope.update = function() {
-            console.log("update");
-            $scope.$digest();
-        }
+        $scope.setvar = function(v) {
+            $scope.variable = v;
+        };
+
+        $scope.show_category = function(category) {
+            $scope.categories_show[category] = true;
+        };
+
+        $scope.hide_category = function(category) {
+            $scope.categories_show[category] = false;
+        };
     }
 ]);
 
-App.config(['$routeProvider', function($routeProvider) {
+App.config(['$routeProvider', function ($routeProvider) {
     $routeProvider
         .when('/', {
-                  templateUrl: 'app/views/map.html',
-                  controller: 'MapController'
-              });
+            templateUrl: 'app/views/map.html',
+            controller: 'MapController'
+        });
 }]);
 

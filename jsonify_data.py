@@ -2,6 +2,8 @@ __author__ = 'jeffreyquinn'
 import pandas
 import json
 import re
+import numpy
+from collections import defaultdict
 
 
 TYPES = ['Full Benefit',
@@ -69,7 +71,7 @@ STATES = [
 def load_sheet(sheet):
     year = sheet.split("_")[-1]
     print 'Loading from MMLEADS_PUF_2006-2010.xlsx..'
-    df = pandas.read_excel('MMLEADS_PUF_2006-2010.xlsx', 'PUF_2006', skiprows=1, index_col=[0, 1])
+    df = pandas.read_excel('MMLEADS_PUF_2006-2010.xlsx', sheet, skiprows=1, index_col=[0, 1])
     df = df.replace('.', 0)
     df = df.replace('*', 0)
     df = df.replace('<0.01%', 0.01)
@@ -92,12 +94,26 @@ def load_sheet(sheet):
     return year, output
 
 
+def get_variable_categories():
+    df = pandas.read_excel('MMLEADS_PUF_2006-2010.xlsx', 'PUF_2006')
+    vars = df.ix[0].tolist()
+    vars = [re.sub("[Pp]ercent", "Number", x) for x in vars]
+    categories = pandas.Series(df.keys())
+    categories[categories.apply(lambda x: 'Unnam' in x)] = numpy.nan
+    categories = categories.ffill().tolist()
+    output = defaultdict(list)
+    for x,y in zip(categories, vars):
+        output[x].append(y)
+    json.dump(dict(output), open("app/static/variable_categories.json", "w"), indent=True)
+
+
 def main():
     output = {}
     for sheet in SHEETS:
         output.__setitem__(*load_sheet(sheet))
     print 'Parsing JSON..'
     output['column_names'] = output.values()[0].values()[0].values()[0].keys()
+    get_variable_categories()
     print 'Writing app/static/cms_data.json..'
     with open('app/static/cms_data.json', 'w') as of:
         json.dump(output, of)
