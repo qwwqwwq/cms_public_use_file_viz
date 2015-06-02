@@ -3,7 +3,7 @@
 angular.module('d3', []);
 angular.module('topojson', []);
 angular.module('queue', []);
-angular.module('d3Directives', ['d3', 'queue', 'topojson']);
+angular.module('d3Directives', ['d3', 'queue', 'topojson', 'ui.bootstrap']);
 angular.module('dropdownDirective', []);
 
 

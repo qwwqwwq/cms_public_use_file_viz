@@ -16,7 +16,11 @@
 
 .legend line {
     stroke: #000;
-    shape-rendering: crispEdges;
+    shape-rendering: geometricPrecision;
+}
+
+line {
+    shape-rendering: geometricPrecision;
 }
 
 .nav, .pagination, .carousel, .panel-title a {
@@ -53,4 +57,8 @@
 
 .one-half-button {
     width: 50%;
+}
+
+.btn-group {
+    margin-left: 1px;
 }

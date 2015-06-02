@@ -2,7 +2,7 @@
 
 angular.module('d3Directives').directive(
     'd3Map',
-    ['d3', 'queue', 'topojson', function (d3, queue, topojson) {
+    ['$compile', 'd3', 'queue', 'topojson', function ($compile, d3, queue, topojson) {
         return {
             restrict: 'EA',
             scope: true,
@@ -144,7 +144,7 @@ angular.module('d3Directives').directive(
                         output /= total_enrolled;
                     }
 
-                    return output;
+                    return Math.round(output);
                 }
 
                 function getAllForVariable(year, enrollment_types, variable, proportion) {
@@ -242,10 +242,17 @@ angular.module('d3Directives').directive(
                         .data(topojson.feature(us_states, us_states.objects.states).features)
                         .enter()
                         .append("path")
+                        .attr("tooltip", function(d) {
+                            return d.properties.name + ": " +
+                                getDatum(year, selected_enrollment_types, d.properties.name, variable, proportion);
+                        })
+                        .attr("tooltip-append-to-body", true)
                         .attr("fill", function(d) {
                             return color(getDatum(year, selected_enrollment_types, d.properties.name, variable, proportion));
                         })
                         .attr("d", path);
+
+                    $compile(element)(scope);
                 }
 
                 function getEnrollmentTypesAsArray(enrollment_types) {
