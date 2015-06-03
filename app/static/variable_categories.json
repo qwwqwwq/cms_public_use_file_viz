@@ -218,11 +218,5 @@
   "Number of FFS males with prostate cancer", 
   "Number of FFS males with benign prostatic hyperplasia", 
   "Number of FFS people with depression (any instance including bipolar episodes)"
- ], 
- "Denominators": [
-  "Number of People", 
-  "Number of People with FFS", 
-  "Number of Females with FFS", 
-  "Number of Males with FFS"
  ]
 }

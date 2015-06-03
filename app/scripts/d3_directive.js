@@ -104,7 +104,7 @@ angular.module('d3Directives').directive(
                         .attr("height", height);
                 }
 
-                function getDatum(year, enrollment_types, state_full, variable, proportion) {
+                function getDatum(year, enrollment_types, state_full, variable, denominator) {
                     if (!(state_full in state_name_map)) {
                         console.error(state_full + " not found in state map");
                     }
@@ -137,35 +137,37 @@ angular.module('d3Directives').directive(
                         if (!(numerator in cms_data[year][enrollment_types[i]][state])) {
                             console.error(state + " not found in year " + year + " type " + enrollment_types[i] + " variable " + numerator);
                         }
-                        total_enrolled += cms_data[year][enrollment_types[i]][state][numerator];
+                        if (denominator) {
+                            total_enrolled += cms_data[year][enrollment_types[i]][state][denominator];
+                        }
                     }
 
-                    if (proportion) {
+                    if (denominator) {
                         output /= total_enrolled;
                     }
 
                     return Math.round(output);
                 }
 
-                function getAllForVariable(year, enrollment_types, variable, proportion) {
+                function getAllForVariable(year, enrollment_types, variable, denominator) {
                     var states = d3.keys(state_name_map);
                     var output = [];
                     var datum;
                     for (var i = 0; i < states.length; i++) {
-                        output.push(getDatum(year, enrollment_types, states[i], variable, proportion));
+                        output.push(getDatum(year, enrollment_types, states[i], variable, denominator));
                     }
                     return output;
                 }
 
-                function render(year, variable, selected_enrollment_types, proportion) {
+                function render(year, variable, selected_enrollment_types, denominator) {
                     if (!scope.$parent.loaded) {
                         return;
                     }
                     console.log("Rendering " + variable + " for year " + year);
                     console.log(selected_enrollment_types);
-                    console.log(proportion);
+                    console.log(denominator);
 
-                    var all_values = getAllForVariable(year, selected_enrollment_types, variable, proportion);
+                    var all_values = getAllForVariable(year, selected_enrollment_types, variable, denominator);
 
                     console.log("Range is " + d3.extent(all_values));
 
@@ -181,7 +183,7 @@ angular.module('d3Directives').directive(
 
                     var format;
 
-                    if (proportion) {
+                    if (denominator) {
                         if (/dollar/i.test(variable) || /payment/i.test(variable)) {
                             format = d3.format("$.3s");
                         } else {
@@ -244,11 +246,11 @@ angular.module('d3Directives').directive(
                         .append("path")
                         .attr("tooltip", function(d) {
                             return d.properties.name + ": " +
-                                getDatum(year, selected_enrollment_types, d.properties.name, variable, proportion);
+                                getDatum(year, selected_enrollment_types, d.properties.name, variable, denominator);
                         })
                         .attr("tooltip-append-to-body", true)
                         .attr("fill", function(d) {
-                            return color(getDatum(year, selected_enrollment_types, d.properties.name, variable, proportion));
+                            return color(getDatum(year, selected_enrollment_types, d.properties.name, variable, denominator));
                         })
                         .attr("d", path);
 
@@ -281,28 +283,28 @@ angular.module('d3Directives').directive(
                     render(scope.$parent.year,
                         scope.$parent.variable,
                         getEnrollmentTypesAsArray(scope.$parent.enrollment_types),
-                        scope.$parent.proportion);
+                        scope.$parent.denominator);
                 }, true);
 
                 scope.$watch('year', function (newVals, oldVals) {
                     render(scope.$parent.year,
                         scope.$parent.variable,
                         getEnrollmentTypesAsArray(scope.$parent.enrollment_types),
-                        scope.$parent.proportion);
+                        scope.$parent.denominator);
                 }, true);
 
                 scope.$watch('enrollment_types', function (newVals, oldVals) {
                     render(scope.$parent.year,
                         scope.$parent.variable,
                         getEnrollmentTypesAsArray(scope.$parent.enrollment_types),
-                        scope.$parent.proportion);
+                        scope.$parent.denominator);
                 }, true);
 
-                scope.$watch('proportion', function (newVals, oldVals) {
+                scope.$watch('denominator', function (newVals, oldVals) {
                     render(scope.$parent.year,
                         scope.$parent.variable,
                         getEnrollmentTypesAsArray(scope.$parent.enrollment_types),
-                        scope.$parent.proportion);
+                        scope.$parent.denominator);
                 }, true);
             }
         };

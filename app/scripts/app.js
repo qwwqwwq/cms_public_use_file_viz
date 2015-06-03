@@ -28,7 +28,7 @@ App.controller('MapController', ['$scope', '$timeout', 'queue', 'd3',
             }
         });
         $scope.loaded = false;
-        $scope.variable = "Number of People";
+        $scope.variable = "Total Medicare IP Hospital FFS payments";
         $scope.column_names = [];
         $scope.year = "2006";
         $scope.enrollment_types = {
@@ -37,7 +37,7 @@ App.controller('MapController', ['$scope', '$timeout', 'queue', 'd3',
             'Medicare Only': false,
             'Medicaid Only (Disability)': false
         };
-        $scope.proportion = false;
+        $scope.denominator = false;
 
         $scope.setvar = function(v) {
             $scope.variable = v;

@@ -14,19 +14,23 @@
                 Choose Variable:
             </div>
             <div class="col-lg-10">
-                <div class="btn-group big-button" dropdown is-open="status.isopen" auto-close="outsideClick">
-                    <button type="button" class="btn btn-primary big-button dropdown-toggle" dropdown-toggle>
-                        {{variable}}
-                        <span class="caret"></span>
-                    </button>
-                    <div class="dropdown-menu big-button" role="menu">
-                        <div ng-repeat="(category, items) in variable_categories">
-                            <ul class="dropdown-column">
-                                <category ng-click="toggle_category(category)" />
-                                <li class="divider"></li>
-                                <variable ng-repeat="item in variable_categories[category]"
-                                          ng-show="categories_show[category]" ng-click="setvar(item)"/>
-                            </ul>
+                <div class="btn-group btn-group-justified" role="group">
+                    <div class="btn-group" role="group">
+                        <div dropdown is-open="status.isopen" auto-close="outsideClick">
+                            <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle>
+                                {{variable}}
+                                <span class="caret"></span>
+                            </button>
+                            <div class="dropdown-menu big-button" role="menu">
+                                <div ng-repeat="(category, items) in variable_categories">
+                                    <ul class="dropdown-column">
+                                        <category ng-click="toggle_category(category)"/>
+                                        <li class="divider"></li>
+                                        <variable ng-repeat="item in variable_categories[category]"
+                                                  ng-show="categories_show[category]" ng-click="setvar(item)"/>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -37,22 +41,32 @@
                 Choose Year:
             </div>
             <div class="col-lg-10">
-                <div class="btn-group big-button">
-                    <label class="btn btn-primary one-fifth-button" ng-model="year" btn-radio="'2006'">
-                        2006
-                    </label>
-                    <label class="btn btn-primary one-fifth-button" ng-model="year" btn-radio="'2007'">
-                        2007
-                    </label>
-                    <label class="btn btn-primary one-fifth-button" ng-model="year" btn-radio="'2008'">
-                        2008
-                    </label>
-                    <label class="btn btn-primary one-fifth-button" ng-model="year" btn-radio="'2009'">
-                        2009
-                    </label>
-                    <label class="btn btn-primary one-fifth-button" ng-model="year" btn-radio="'2010'">
-                        2010
-                    </label>
+                <div class="btn-group btn-group-justified" role="group">
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-primary" ng-model="year" btn-radio="'2006'">
+                            2006
+                        </label>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-primary" ng-model="year" btn-radio="'2007'">
+                            2007
+                        </label>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-primary" ng-model="year" btn-radio="'2008'">
+                            2008
+                        </label>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-primary" ng-model="year" btn-radio="'2009'">
+                            2009
+                        </label>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-primary" ng-model="year" btn-radio="'2010'">
+                            2010
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -61,35 +75,67 @@
                 Choose Enrollment(s):
             </div>
             <div class="col-lg-10">
-                <div class="btn-group big-button">
-                    <label class="btn btn-primary one-fourth-button" ng-model="enrollment_types['Full Benefit']"
-                           btn-checkbox>
-                        Full Benefit
-                    </label>
-                    <label class="btn btn-primary one-fourth-button" ng-model="enrollment_types['Partial Benefit']"
-                           btn-checkbox>
-                        Partial Benefit
-                    </label>
-                    <label class="btn btn-primary one-fourth-button" ng-model="enrollment_types['Medicare Only']"
-                           btn-checkbox>
-                        Medicare Only
-                    </label>
-                    <label class="btn btn-primary one-fourth-button"
-                           ng-model="enrollment_types['Medicaid Only (Disability)']" btn-checkbox>
-                        Medicaid Only (Disability)
-                    </label>
+                <div class="btn-group btn-group-justified">
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-primary" ng-model="enrollment_types['Full Benefit']"
+                               btn-checkbox>
+                            Full Benefit
+                        </label>
+                    </div>
+
+
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-primary" ng-model="enrollment_types['Partial Benefit']"
+                               btn-checkbox>
+                            Partial Benefit
+                        </label>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-primary" ng-model="enrollment_types['Medicare Only']"
+                               btn-checkbox>
+                            Medicare Only
+                        </label>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-primary"
+                               ng-model="enrollment_types['Medicaid Only (Disability)']" btn-checkbox>
+                            Medicaid Only (Disability)
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-lg-2">
-                Total / Per Enrolled:
+                Denominator:
             </div>
             <div class="col-lg-10">
-                <div class="btn-group big-button">
-                    <label class="btn btn-primary one-half-button" ng-model="proportion" btn-radio="false">Total</label>
-                    <label class="btn btn-primary one-half-button" ng-model="proportion" btn-radio="true">Per
-                        Enrolled</label>
+                <div class="btn-group btn-group-justified" role="group">
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-primary" ng-model="denominator" btn-radio="false">
+                            None
+                        </label>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-primary" ng-model="denominator" btn-radio="'Number of People'">
+                            Total # Enrolled
+                        </label>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-primary" ng-model="denominator" btn-radio="'Number of People with FFS'">
+                            # of People with FFS
+                        </label>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-primary" ng-model="denominator" btn-radio="'Number of Females with FFS'">
+                            # of Females with FFS
+                        </label>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-primary" ng-model="denominator" btn-radio="'Number of Males with FFS'">
+                            # of Males with FFS
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
