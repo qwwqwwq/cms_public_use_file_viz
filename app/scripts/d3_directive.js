@@ -20,48 +20,48 @@ angular.module('d3Directives').directive(
                     "Connecticut":                           "CT",
                     "Delaware":                              "DE",
                     "District of Columbia":                  "DC",
-                    "Florida":                                          "FL",
-                    "Georgia":                                          "GA",
-                    "Hawaii":                                           "HI",
-                    "Idaho":                                            "ID",
-                    "Illinois":                                         "IL",
-                    "Indiana":                                          "IN",
-                    "Iowa":                                             "IA",
-                    "Kansas":                                           "KS",
-                    "Kentucky":                                         "KY",
-                    "Louisiana":                                        "LA",
-                    "Maine":                                            "ME",
-                    "Maryland":                                         "MD",
-                    "Massachusetts":                                    "MA",
-                    "Michigan":                                         "MI",
-                    "Minnesota":                                        "MN",
-                    "Mississippi":                                      "MS",
-                    "Missouri":                                         "MO",
-                    "Montana":                                          "MT",
-                    "Nebraska":                                         "NE",
-                    "Nevada":                                           "NV",
-                    "New Hampshire":                                    "NH",
-                    "New Jersey":                                       "NJ",
-                    "New Mexico":                                       "NM",
-                    "New York":                                         "NY",
-                    "North Carolina":                                   "NC",
-                    "North Dakota":                                     "ND",
-                    "Ohio":                                             "OH",
-                    "Oklahoma":                                         "OK",
-                    "Oregon":                                           "OR",
-                    "Pennsylvania":                                     "PA",
-                    "Rhode Island":                                     "RI",
-                    "South Carolina":                                   "SC",
-                    "South Dakota":                                     "SD",
-                    "Tennessee":                                        "TN",
-                    "Texas":                                            "TX",
-                    "Utah":                                             "UT",
-                    "Vermont":                                          "VT",
-                    "Virginia":                                         "VA",
-                    "Washington":                                       "WA",
-                    "West Virginia":                                    "WV",
-                    "Wisconsin":                                        "WI",
-                    "Wyoming":                                           "WY"
+                    "Florida":                               "FL",
+                    "Georgia":                               "GA",
+                    "Hawaii":                                "HI",
+                    "Idaho":                                 "ID",
+                    "Illinois":                              "IL",
+                    "Indiana":                               "IN",
+                    "Iowa":                                  "IA",
+                    "Kansas":                                "KS",
+                    "Kentucky":                              "KY",
+                    "Louisiana":                             "LA",
+                    "Maine":                                 "ME",
+                    "Maryland":                              "MD",
+                    "Massachusetts":                         "MA",
+                    "Michigan":                              "MI",
+                    "Minnesota":                             "MN",
+                    "Mississippi":                           "MS",
+                    "Missouri":                              "MO",
+                    "Montana":                               "MT",
+                    "Nebraska":                              "NE",
+                    "Nevada":                                "NV",
+                    "New Hampshire":                         "NH",
+                    "New Jersey":                            "NJ",
+                    "New Mexico":                            "NM",
+                    "New York":                              "NY",
+                    "North Carolina":                        "NC",
+                    "North Dakota":                          "ND",
+                    "Ohio":                                  "OH",
+                    "Oklahoma":                              "OK",
+                    "Oregon":                                "OR",
+                    "Pennsylvania":                          "PA",
+                    "Rhode Island":                          "RI",
+                    "South Carolina":                        "SC",
+                    "South Dakota":                          "SD",
+                    "Tennessee":                             "TN",
+                    "Texas":                                 "TX",
+                    "Utah":                                  "UT",
+                    "Vermont":                               "VT",
+                    "Virginia":                              "VA",
+                    "Washington":                            "WA",
+                    "West Virginia":                         "WV",
+                    "Wisconsin":                             "WI",
+                    "Wyoming":                               "WY"
                 };
 
                 queue()
@@ -87,8 +87,7 @@ angular.module('d3Directives').directive(
                 }
 
                 var width = 960,
-                    height = 740;
-
+                    height = 680;
 
                 var projection = d3.geo.albersUsa()
                     .scale(1280)
@@ -105,17 +104,24 @@ angular.module('d3Directives').directive(
                 }
 
                 function getDatum(year, enrollment_types, state_full, variable, denominator) {
+                    if (typeof cms_data === 'undefined') {
+                        console.error("cms data not loaded");
+                        return 0.0;
+                    }
+
                     if (!(state_full in state_name_map)) {
                         console.error(state_full + " not found in state map");
                     }
+
                     var state = state_name_map[state_full];
 
                     if (!(year in cms_data)) {
+                        console.error(year + " not found in data");
                         return 0.0;
                     }
 
                     var output = 0.0;
-                    var total_enrolled = 0;
+                    var total_enrolled = 0.0;
                     for (var i = 0; i < enrollment_types.length; i++) {
                         if (!(year in cms_data)) {
                             console.error(year + " not found in data");
@@ -146,7 +152,7 @@ angular.module('d3Directives').directive(
                         output /= total_enrolled;
                     }
 
-                    return Math.round(output);
+                    return (output);
                 }
 
                 function getAllForVariable(year, enrollment_types, variable, denominator) {
@@ -160,12 +166,9 @@ angular.module('d3Directives').directive(
                 }
 
                 function render(year, variable, selected_enrollment_types, denominator) {
-                    if (!scope.$parent.loaded) {
+                    if (!scope.$parent.loaded || typeof cms_data === 'undefined') {
                         return;
                     }
-                    console.log("Rendering " + variable + " for year " + year);
-                    console.log(selected_enrollment_types);
-                    console.log(denominator);
 
                     var all_values = getAllForVariable(year, selected_enrollment_types, variable, denominator);
 
@@ -182,19 +185,28 @@ angular.module('d3Directives').directive(
                     var svg = initalizeSvg();
 
                     var format;
+                    var long_format;
 
                     if (denominator) {
                         if (/dollar/i.test(variable) || /payment/i.test(variable)) {
                             format = d3.format("$.3s");
+                            long_format = d3.format("$.3s");
+                        } else if (/admission/i.test(variable) || /days/i.test(variable) || /visits/i.test(variable)) {
+                            format = d3.format("4s");
+                            long_format = d3.format(".2f");
                         } else {
-                            format = d3.format(".2%")
+                            format = d3.format(".2%");
+                            long_format = d3.format(".2%");
                         }
                     } else if (/number/i.test(variable) || /count/i.test(variable)) {
                         format = d3.format("4s");
+                        long_format = d3.format("");
                     } else if (/dollar/i.test(variable) || /payment/i.test(variable)) {
                         format = d3.format("$.3s");
+                        long_format = d3.format("$,");
                     } else {
-                        format = d3.format("")
+                        format = d3.format("");
+                        long_format = d3.format(".2f");
                     }
 
                     var xAxis = d3.svg.axis()
@@ -234,19 +246,30 @@ angular.module('d3Directives').directive(
                         .attr("class", "caption")
                         .attr("y", -12)
                         .attr("x", 90)
-                        .text(variable);
+                        .text(function() {
+                            if (denominator) {
+                                return variable + " per " + denominator;
+                            } else {
+                                return variable;
+                            }
+                        });
 
                     // map
                     svg.append("g")
-                        .attr("transform", "translate(0,-80)")
+                        .attr("transform", "translate(0,-50)")
                         .attr("class", "states")
                         .selectAll("path")
                         .data(topojson.feature(us_states, us_states.objects.states).features)
                         .enter()
                         .append("path")
                         .attr("tooltip", function(d) {
-                            return d.properties.name + ": " +
-                                getDatum(year, selected_enrollment_types, d.properties.name, variable, denominator);
+                            var out = d.properties.name + " " + variable;
+                            if (denominator) {
+                                out += " per " + denominator;
+                            }
+                            return out + ": " +
+                                long_format(getDatum(year, selected_enrollment_types,
+                                    d.properties.name, variable, denominator));
                         })
                         .attr("tooltip-append-to-body", true)
                         .attr("fill", function(d) {
@@ -268,15 +291,6 @@ angular.module('d3Directives').directive(
                     }
                     console.log(output);
                     return output;
-                }
-
-                function getTrueKey(obj) {
-                    var arr = d3.entries(obj);
-                    for (var i = 0; i<arr.length; i++) {
-                        if(arr[i].value) {
-                            return arr[i].key;
-                        }
-                    }
                 }
 
                 scope.$watch('variable', function (newVals, oldVals) {
