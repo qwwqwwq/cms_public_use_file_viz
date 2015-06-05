@@ -2,90 +2,11 @@
 
 angular.module('d3Directives').directive(
     'd3Map',
-    ['$compile', 'd3', 'queue', 'topojson', function ($compile, d3, queue, topojson) {
+    ['$compile', 'd3', 'queue', 'topojson', 'data', function ($compile, d3, queue, topojson, data) {
         return {
             restrict: 'EA',
             scope: true,
-            link: function (scope, element, attrs) {
-                var us_states, cms_data;
-                var numerator = 'Number of People';
-                var state_name_map =
-                {
-                    "Alabama":                               "AL",
-                    "Alaska":                                "AK",
-                    "Arizona":                               "AZ",
-                    "Arkansas":                              "AR",
-                    "California":                            "CA",
-                    "Colorado":                              "CO",
-                    "Connecticut":                           "CT",
-                    "Delaware":                              "DE",
-                    "District of Columbia":                  "DC",
-                    "Florida":                               "FL",
-                    "Georgia":                               "GA",
-                    "Hawaii":                                "HI",
-                    "Idaho":                                 "ID",
-                    "Illinois":                              "IL",
-                    "Indiana":                               "IN",
-                    "Iowa":                                  "IA",
-                    "Kansas":                                "KS",
-                    "Kentucky":                              "KY",
-                    "Louisiana":                             "LA",
-                    "Maine":                                 "ME",
-                    "Maryland":                              "MD",
-                    "Massachusetts":                         "MA",
-                    "Michigan":                              "MI",
-                    "Minnesota":                             "MN",
-                    "Mississippi":                           "MS",
-                    "Missouri":                              "MO",
-                    "Montana":                               "MT",
-                    "Nebraska":                              "NE",
-                    "Nevada":                                "NV",
-                    "New Hampshire":                         "NH",
-                    "New Jersey":                            "NJ",
-                    "New Mexico":                            "NM",
-                    "New York":                              "NY",
-                    "North Carolina":                        "NC",
-                    "North Dakota":                          "ND",
-                    "Ohio":                                  "OH",
-                    "Oklahoma":                              "OK",
-                    "Oregon":                                "OR",
-                    "Pennsylvania":                          "PA",
-                    "Rhode Island":                          "RI",
-                    "South Carolina":                        "SC",
-                    "South Dakota":                          "SD",
-                    "Tennessee":                             "TN",
-                    "Texas":                                 "TX",
-                    "Utah":                                  "UT",
-                    "Vermont":                               "VT",
-                    "Virginia":                              "VA",
-                    "Washington":                            "WA",
-                    "West Virginia":                         "WV",
-                    "Wisconsin":                             "WI",
-                    "Wyoming":                               "WY"
-                };
-
-                queue()
-                    .defer(d3.json, "app/static/us_states.json")
-                    .defer(d3.json, "app/static/cms_data.json")
-                    .awaitAll(ready);
-
-                function ready(error, data) {
-                    if (scope.$parent.loaded) {
-                        return;
-                    }
-                    if (error) {
-                        console.error(error);
-                    }
-                    us_states = data[0];
-                    cms_data = data[1];
-                    scope.$parent.column_names = cms_data.column_names.sort();
-                    scope.$parent.loaded = true;
-                    scope.$parent.$digest();
-                    console.log("Loaded GEO and CMS data from JSON..");
-                    render(scope.$parent.year, scope.$parent.variable,
-                        getEnrollmentTypesAsArray(scope.$parent.enrollment_types), scope.$parent.proportion);
-                }
-
+            link: function (scope, element, attr) {
                 var width = 960,
                     height = 680;
 
@@ -104,18 +25,18 @@ angular.module('d3Directives').directive(
                 }
 
                 function getDatum(year, enrollment_types, state_full, variable, denominator) {
-                    if (typeof cms_data === 'undefined') {
+                    if (typeof data.cms_data === 'undefined') {
                         console.error("cms data not loaded");
                         return 0.0;
                     }
 
-                    if (!(state_full in state_name_map)) {
+                    if (!(state_full in data.state_name_map)) {
                         console.error(state_full + " not found in state map");
                     }
 
-                    var state = state_name_map[state_full];
+                    var state = data.state_name_map[state_full];
 
-                    if (!(year in cms_data)) {
+                    if (!(year in data.cms_data)) {
                         console.error(year + " not found in data");
                         return 0.0;
                     }
@@ -123,28 +44,25 @@ angular.module('d3Directives').directive(
                     var output = 0.0;
                     var total_enrolled = 0.0;
                     for (var i = 0; i < enrollment_types.length; i++) {
-                        if (!(year in cms_data)) {
+                        if (!(year in data.cms_data)) {
                             console.error(year + " not found in data");
                         }
 
-                        if (!(enrollment_types[i] in cms_data[year])) {
+                        if (!(enrollment_types[i] in data.cms_data[year])) {
                             console.error(enrollment_types[i] + " not found in year " + year);
                         }
 
-                        if (!(state in cms_data[year][enrollment_types[i]])) {
-                            console.error(state  + "(" + state_full + ") not found in year " + year + " type " + enrollment_types[i]);
+                        if (!(state in data.cms_data[year][enrollment_types[i]])) {
+                            console.error(state + "(" + state_full + ") not found in year " + year + " type " + enrollment_types[i]);
                         }
 
-                        if (!(variable in cms_data[year][enrollment_types[i]][state])) {
+                        if (!(variable in data.cms_data[year][enrollment_types[i]][state])) {
                             console.error(state + " not found in year " + year + " type " + enrollment_types[i] + " variable " + variable);
                         }
 
-                        output += cms_data[year][enrollment_types[i]][state][variable];
-                        if (!(numerator in cms_data[year][enrollment_types[i]][state])) {
-                            console.error(state + " not found in year " + year + " type " + enrollment_types[i] + " variable " + numerator);
-                        }
+                        output += data.cms_data[year][enrollment_types[i]][state][variable];
                         if (denominator) {
-                            total_enrolled += cms_data[year][enrollment_types[i]][state][denominator];
+                            total_enrolled += data.cms_data[year][enrollment_types[i]][state][denominator];
                         }
                     }
 
@@ -156,9 +74,8 @@ angular.module('d3Directives').directive(
                 }
 
                 function getAllForVariable(year, enrollment_types, variable, denominator) {
-                    var states = d3.keys(state_name_map);
+                    var states = d3.keys(data.state_name_map);
                     var output = [];
-                    var datum;
                     for (var i = 0; i < states.length; i++) {
                         output.push(getDatum(year, enrollment_types, states[i], variable, denominator));
                     }
@@ -166,7 +83,8 @@ angular.module('d3Directives').directive(
                 }
 
                 function render(year, variable, selected_enrollment_types, denominator) {
-                    if (!scope.$parent.loaded || typeof cms_data === 'undefined') {
+                    if (typeof data.cms_data === 'undefined' || !scope.$parent.loaded) {
+                        console.error("Cannot render, data not loaded");
                         return;
                     }
 
@@ -210,14 +128,14 @@ angular.module('d3Directives').directive(
                     }
 
                     var xAxis = d3.svg.axis()
-                        .scale(scale)
-                        .orient("bottom")
-                        .tickSize(13)
-                        .tickFormat(format)
+                            .scale(scale)
+                            .orient("bottom")
+                            .tickSize(13)
+                            .tickFormat(format)
                         ;
 
                     function pair(array) {
-                        return array.slice(1).map(function(b, i) {
+                        return array.slice(1).map(function (b, i) {
                             return [array[i], b];
                         });
                     }
@@ -232,13 +150,15 @@ angular.module('d3Directives').directive(
                         .data(pair([d3.min(all_values)].concat(scale.ticks(10)).concat([d3.max(all_values)])))
                         .enter().append("rect")
                         .attr("height", 8)
-                        .attr("x", function(d) {
+                        .attr("x", function (d) {
                             return scale(d[0]);
                         })
-                        .attr("width", function(d) {
+                        .attr("width", function (d) {
                             return scale(d[1]) - scale(d[0]);
                         })
-                        .style("fill", function(d) { return color(d[0]); });
+                        .style("fill", function (d) {
+                            return color(d[0]);
+                        });
 
                     // legend
                     legend.call(xAxis)
@@ -246,7 +166,7 @@ angular.module('d3Directives').directive(
                         .attr("class", "caption")
                         .attr("y", -12)
                         .attr("x", 90)
-                        .text(function() {
+                        .text(function () {
                             if (denominator) {
                                 return variable + " per " + denominator;
                             } else {
@@ -259,10 +179,10 @@ angular.module('d3Directives').directive(
                         .attr("transform", "translate(0,-50)")
                         .attr("class", "states")
                         .selectAll("path")
-                        .data(topojson.feature(us_states, us_states.objects.states).features)
+                        .data(topojson.feature(data.us_states, data.us_states.objects.states).features)
                         .enter()
                         .append("path")
-                        .attr("tooltip", function(d) {
+                        .attr("tooltip", function (d) {
                             var out = d.properties.name + " " + variable;
                             if (denominator) {
                                 out += " per " + denominator;
@@ -272,12 +192,12 @@ angular.module('d3Directives').directive(
                                     d.properties.name, variable, denominator));
                         })
                         .attr("tooltip-append-to-body", true)
-                        .attr("fill", function(d) {
+                        .attr("fill", function (d) {
                             return color(getDatum(year, selected_enrollment_types, d.properties.name, variable, denominator));
                         })
                         .attr("d", path);
 
-                    $compile(element)(scope);
+                    //$compile(element)(scope);
                 }
 
                 function getEnrollmentTypesAsArray(enrollment_types) {
@@ -293,33 +213,19 @@ angular.module('d3Directives').directive(
                     return output;
                 }
 
-                scope.$watch('variable', function (newVals, oldVals) {
-                    render(scope.$parent.year,
-                        scope.$parent.variable,
-                        getEnrollmentTypesAsArray(scope.$parent.enrollment_types),
+                function renderFromScope() {
+                    render(scope.$parent.year.slice(),
+                        scope.$parent.variable.slice(),
+                        getEnrollmentTypesAsArray(scope.$parent.enrollment_types).slice(),
                         scope.$parent.denominator);
-                }, true);
+                }
 
-                scope.$watch('year', function (newVals, oldVals) {
-                    render(scope.$parent.year,
-                        scope.$parent.variable,
-                        getEnrollmentTypesAsArray(scope.$parent.enrollment_types),
-                        scope.$parent.denominator);
-                }, true);
+                scope.$watchGroup(['variable', 'year', 'enrollment_types', 'denominator', 'loaded'],
+                    function (newValues, oldValues, scope) {
+                        renderFromScope();
+                    }, false);
 
-                scope.$watch('enrollment_types', function (newVals, oldVals) {
-                    render(scope.$parent.year,
-                        scope.$parent.variable,
-                        getEnrollmentTypesAsArray(scope.$parent.enrollment_types),
-                        scope.$parent.denominator);
-                }, true);
-
-                scope.$watch('denominator', function (newVals, oldVals) {
-                    render(scope.$parent.year,
-                        scope.$parent.variable,
-                        getEnrollmentTypesAsArray(scope.$parent.enrollment_types),
-                        scope.$parent.denominator);
-                }, true);
+                initalizeSvg();
             }
         };
     }]

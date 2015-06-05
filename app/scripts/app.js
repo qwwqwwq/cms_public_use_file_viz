@@ -3,7 +3,8 @@
 angular.module('d3', []);
 angular.module('topojson', []);
 angular.module('queue', []);
-angular.module('d3Directives', ['d3', 'queue', 'topojson', 'ui.bootstrap']);
+angular.module('data', ['d3', 'queue']);
+angular.module('d3Directives', ['d3', 'queue', 'topojson', 'ui.bootstrap', 'data']);
 angular.module('dropdownDirective', []);
 
 
@@ -20,14 +21,15 @@ App.controller('MapController', ['$scope', '$timeout', 'queue', 'd3',
     function ($scope, $timeout, queue, d3) {
         $scope.variable_categories = {};
         $scope.categories_show = {};
+        $scope.loaded = false;
         d3.json("app/static/variable_categories.json", function(data) {
             $scope.variable_categories = data;
             var arr = d3.keys(data);
             for (var i = 0; i<arr.length; i++) {
                 $scope.categories_show[arr[i]] = false;
             }
+            $scope.loaded = true;
         });
-        $scope.loaded = false;
         $scope.variable = "Total Medicare IP Hospital FFS payments";
         $scope.column_names = [];
         $scope.year = "2006";
