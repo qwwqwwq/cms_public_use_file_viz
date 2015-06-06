@@ -4,7 +4,6 @@
         .factory('data', ['d3', 'queue', function (d3, queue) {
             var output = {};
 
-            console.log("here");
             queue()
                 .defer(d3.json, "app/static/us_states.json")
                 .defer(d3.json, "app/static/cms_data.json")
@@ -14,7 +13,6 @@
                 if (error) {
                     console.error(error);
                 }
-                console.log("ready");
                 output.us_states = data[0];
                 output.cms_data = data[1];
             }

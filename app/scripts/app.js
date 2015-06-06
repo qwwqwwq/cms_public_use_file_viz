@@ -29,6 +29,7 @@ App.controller('MapController', ['$scope', '$timeout', 'queue', 'd3',
                 $scope.categories_show[arr[i]] = false;
             }
             $scope.loaded = true;
+            $scope.$digest();
         });
         $scope.variable = "Total Medicare IP Hospital FFS payments";
         $scope.column_names = [];

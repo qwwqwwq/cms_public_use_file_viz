@@ -20,6 +20,7 @@ angular.module('d3Directives').directive(
                 function initalizeSvg() {
                     d3.select("svg").remove();
                     return d3.select("d3_map").append("svg")
+                        .remove()
                         .attr("width", width)
                         .attr("height", height);
                 }
@@ -83,7 +84,7 @@ angular.module('d3Directives').directive(
                 }
 
                 function render(year, variable, selected_enrollment_types, denominator) {
-                    if (typeof data.cms_data === 'undefined' || !scope.$parent.loaded) {
+                    if (!scope.$parent.loaded) {
                         console.error("Cannot render, data not loaded");
                         return;
                     }
@@ -193,11 +194,15 @@ angular.module('d3Directives').directive(
                         })
                         .attr("tooltip-append-to-body", true)
                         .attr("fill", function (d) {
-                            return color(getDatum(year, selected_enrollment_types, d.properties.name, variable, denominator));
+                            return color(getDatum(year, selected_enrollment_types,
+                                d.properties.name, variable, denominator));
                         })
                         .attr("d", path);
 
-                    //$compile(element)(scope);
+                    // To avoid infinite digest loop, we insert the raw html into the directive element
+                    // then call compile on the contents
+                    element.html(svg[0][0].outerHTML);
+                    $compile(element.contents())(scope);
                 }
 
                 function getEnrollmentTypesAsArray(enrollment_types) {
@@ -220,12 +225,16 @@ angular.module('d3Directives').directive(
                         scope.$parent.denominator);
                 }
 
-                scope.$watchGroup(['variable', 'year', 'enrollment_types', 'denominator', 'loaded'],
-                    function (newValues, oldValues, scope) {
-                        renderFromScope();
-                    }, false);
+                var watches = ['variable', 'year', 'enrollment_types', 'denominator', 'loaded'];
 
-                initalizeSvg();
+                for (var i = 0; i < watches.length; i++) {
+                    scope.$watch(watches[i],
+                        function (newValues, oldValues, scope) {
+                            console.log(newValues);
+                            console.log(oldValues);
+                            renderFromScope();
+                        }, true);
+                }
             }
         };
     }]
