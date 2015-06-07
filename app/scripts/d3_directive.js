@@ -7,8 +7,10 @@ angular.module('d3Directives').directive(
             restrict: 'EA',
             scope: true,
             link: function (scope, element, attr) {
-                var width = 960,
-                    height = 680;
+                var width = 1160,
+                    height = 690,
+                    us_states = false,
+                    cms_data = false;
 
                 var projection = d3.geo.albersUsa()
                     .scale(1280)
@@ -26,7 +28,7 @@ angular.module('d3Directives').directive(
                 }
 
                 function getDatum(year, enrollment_types, state_full, variable, denominator) {
-                    if (typeof data.cms_data === 'undefined') {
+                    if (!cms_data) {
                         console.error("cms data not loaded");
                         return 0.0;
                     }
@@ -37,7 +39,7 @@ angular.module('d3Directives').directive(
 
                     var state = data.state_name_map[state_full];
 
-                    if (!(year in data.cms_data)) {
+                    if (!(year in cms_data)) {
                         console.error(year + " not found in data");
                         return 0.0;
                     }
@@ -45,25 +47,25 @@ angular.module('d3Directives').directive(
                     var output = 0.0;
                     var total_enrolled = 0.0;
                     for (var i = 0; i < enrollment_types.length; i++) {
-                        if (!(year in data.cms_data)) {
+                        if (!(year in cms_data)) {
                             console.error(year + " not found in data");
                         }
 
-                        if (!(enrollment_types[i] in data.cms_data[year])) {
+                        if (!(enrollment_types[i] in cms_data[year])) {
                             console.error(enrollment_types[i] + " not found in year " + year);
                         }
 
-                        if (!(state in data.cms_data[year][enrollment_types[i]])) {
+                        if (!(state in cms_data[year][enrollment_types[i]])) {
                             console.error(state + "(" + state_full + ") not found in year " + year + " type " + enrollment_types[i]);
                         }
 
-                        if (!(variable in data.cms_data[year][enrollment_types[i]][state])) {
+                        if (!(variable in cms_data[year][enrollment_types[i]][state])) {
                             console.error(state + " not found in year " + year + " type " + enrollment_types[i] + " variable " + variable);
                         }
 
-                        output += data.cms_data[year][enrollment_types[i]][state][variable];
+                        output += cms_data[year][enrollment_types[i]][state][variable];
                         if (denominator) {
-                            total_enrolled += data.cms_data[year][enrollment_types[i]][state][denominator];
+                            total_enrolled += cms_data[year][enrollment_types[i]][state][denominator];
                         }
                     }
 
@@ -83,8 +85,17 @@ angular.module('d3Directives').directive(
                     return output;
                 }
 
+                function getNationalTotal(year, enrollment_types, variable) {
+                    var states = d3.keys(data.state_name_map);
+                    var output = [];
+                    for (var i = 0; i < states.length; i++) {
+                        output.push(getDatum(year, enrollment_types, states[i], variable, false));
+                    }
+                    return d3.sum(output);
+                }
+
                 function render(year, variable, selected_enrollment_types, denominator) {
-                    if (!scope.$parent.loaded) {
+                    if (!scope.$parent.loaded || !cms_data || !us_states) {
                         console.error("Cannot render, data not loaded");
                         return;
                     }
@@ -99,41 +110,47 @@ angular.module('d3Directives').directive(
 
                     var scale = d3.scale.linear()
                         .domain(d3.extent(all_values))
-                        .range([100, 800]);
+                        .range([250, 900]);
 
                     var svg = initalizeSvg();
 
                     var format;
                     var long_format;
+                    var total_format;
 
                     if (denominator) {
                         if (/dollar/i.test(variable) || /payment/i.test(variable)) {
                             format = d3.format("$.3s");
                             long_format = d3.format("$.3s");
+                            total_format = d3.format("$,r")
                         } else if (/admission/i.test(variable) || /days/i.test(variable) || /visits/i.test(variable)) {
                             format = d3.format("4s");
                             long_format = d3.format(".2f");
+                            total_format = d3.format(",r");
                         } else {
                             format = d3.format(".2%");
                             long_format = d3.format(".2%");
+                            total_format =  d3.format(",r");
                         }
                     } else if (/number/i.test(variable) || /count/i.test(variable)) {
                         format = d3.format("4s");
-                        long_format = d3.format("");
+                        long_format = d3.format(",r");
+                        total_format =  d3.format(",r");
                     } else if (/dollar/i.test(variable) || /payment/i.test(variable)) {
                         format = d3.format("$.3s");
-                        long_format = d3.format("$,");
+                        long_format = d3.format("$,r");
+                        total_format =  d3.format("$,r");
                     } else {
                         format = d3.format("");
-                        long_format = d3.format(".2f");
+                        long_format = d3.format(",.2f");
+                        total_format =  d3.format(",r");
                     }
 
                     var xAxis = d3.svg.axis()
                             .scale(scale)
                             .orient("bottom")
                             .tickSize(13)
-                            .tickFormat(format)
-                        ;
+                            .tickFormat(format);
 
                     function pair(array) {
                         return array.slice(1).map(function (b, i) {
@@ -143,7 +160,7 @@ angular.module('d3Directives').directive(
 
                     var legend = svg.append("g")
                         .attr("class", "legend")
-                        .attr("transform", "translate(0," + (height - 60) + ")");
+                        .attr("transform", "translate(0," + (height - 40) + ")");
 
                     // legend
                     legend.selectAll("rect")
@@ -165,14 +182,31 @@ angular.module('d3Directives').directive(
                     legend.call(xAxis)
                         .append("text")
                         .attr("class", "caption")
-                        .attr("y", -12)
-                        .attr("x", 90)
+                        .attr("y", -30)
+                        .attr("x", 250)
                         .text(function () {
+                            var output;
                             if (denominator) {
-                                return variable + " per " + denominator;
+                                output = variable + " per " + denominator;
                             } else {
-                                return variable;
+                                output = variable;
                             }
+
+                            return output;
+                        });
+
+                    // legend
+                    legend.call(xAxis)
+                        .append("text")
+                        .attr("class", "caption")
+                        .attr("y", -12)
+                        .attr("x", 250)
+                        .text(function () {
+                            var output = "National Total: " +
+                            total_format(
+                                Math.round(getNationalTotal(year, selected_enrollment_types, variable)));
+
+                            return output;
                         });
 
                     // map
@@ -180,17 +214,22 @@ angular.module('d3Directives').directive(
                         .attr("transform", "translate(0,-50)")
                         .attr("class", "states")
                         .selectAll("path")
-                        .data(topojson.feature(data.us_states, data.us_states.objects.states).features)
+                        .data(topojson.feature(us_states, us_states.objects.states).features)
                         .enter()
                         .append("path")
                         .attr("tooltip", function (d) {
                             var out = d.properties.name + " " + variable;
+                            var number;
                             if (denominator) {
                                 out += " per " + denominator;
-                            }
-                            return out + ": " +
-                                long_format(getDatum(year, selected_enrollment_types,
+                                number = long_format(getDatum(year, selected_enrollment_types,
                                     d.properties.name, variable, denominator));
+                            } else {
+                                number = long_format(Math.round(getDatum(year, selected_enrollment_types,
+                                    d.properties.name, variable, denominator)));
+                            }
+                            out += ": ";
+                            return out + number;
                         })
                         .attr("tooltip-append-to-body", true)
                         .attr("fill", function (d) {
@@ -234,6 +273,20 @@ angular.module('d3Directives').directive(
                             console.log(oldValues);
                             renderFromScope();
                         }, true);
+                }
+
+                queue()
+                    .defer(d3.json, "app/static/us_states.json")
+                    .defer(d3.json, "app/static/cms_data.json")
+                    .awaitAll(ready);
+
+                function ready(error, data) {
+                    if (error) {
+                        console.error(error);
+                    }
+                    us_states = data[0];
+                    cms_data = data[1];
+                    renderFromScope();
                 }
             }
         };

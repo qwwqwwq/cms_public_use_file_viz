@@ -4,18 +4,6 @@
         .factory('data', ['d3', 'queue', function (d3, queue) {
             var output = {};
 
-            queue()
-                .defer(d3.json, "app/static/us_states.json")
-                .defer(d3.json, "app/static/cms_data.json")
-                .awaitAll(ready);
-
-            function ready(error, data) {
-                if (error) {
-                    console.error(error);
-                }
-                output.us_states = data[0];
-                output.cms_data = data[1];
-            }
 
             output.state_name_map = {
                 "Alabama": "AL",
