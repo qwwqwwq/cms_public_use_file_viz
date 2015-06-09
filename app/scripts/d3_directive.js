@@ -135,7 +135,7 @@ angular.module('d3Directives').directive(
                     var total_format;
 
                     if (denominator) {
-                        if (/dollar/i.test(variable) || /payment/i.test(variable)) {
+                        if (/dollar/i.test(variable) || /payment/i.test(variable) || / costs?/i.test(variable)) {
                             format = "$.3s";
                             long_format = ("$.3s");
                             total_format = ("$,r")
@@ -152,7 +152,7 @@ angular.module('d3Directives').directive(
                         format = ("4s");
                         long_format = (",r");
                         total_format =  (",r");
-                    } else if (/dollar/i.test(variable) || /payment/i.test(variable)) {
+                    } else if (/dollar/i.test(variable) || /payment/i.test(variable) || / costs?/i.test(variable)) {
                         format = ("$.3s");
                         long_format = ("$,r");
                         total_format =  ("$,r");
@@ -228,14 +228,18 @@ angular.module('d3Directives').directive(
                         .attr("y", -12)
                         .attr("x", 250)
                         .text(function () {
-                            var output = "National Total: " +
-                            total_format(Math.round(
+                            var output;
+                            if (comparison_year) {
+                                output = "National Total Difference (" + year + String.fromCharCode(8209) + comparison_year + "): ";
+                            } else {
+                                output = "National Total (" + year + "): ";
+                            }
+
+                            return output + total_format(Math.round(
                                     getNationalTotal(year,
                                         selected_enrollment_types,
                                         variable,
                                         comparison_year)));
-
-                            return output;
                         });
 
                     // map
