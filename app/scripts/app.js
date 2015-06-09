@@ -34,6 +34,7 @@ App.controller('MapController', ['$scope', '$timeout', 'queue', 'd3',
         $scope.variable = "Total Medicare IP Hospital FFS payments";
         $scope.column_names = [];
         $scope.year = "2006";
+        $scope.comparison_year = false;
         $scope.enrollment_types = {
             'Full Benefit': true,
             'Partial Benefit': false,

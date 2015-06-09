@@ -3,6 +3,7 @@
         <div class="row">
             <h3 class="bg-info">Medicare-Medicaid Linked Enrollee Analytic Data Source (MMLEADS) Version 2.0 Public Use
                 File (PUF)</h3>
+
             <p class="lead">
                 On 4/23/15 the Centers for Medicare & Medicade Services released a public-use file containing
                 information on eligibility, enrollment, cost, use, and select health and mental health conditions for
@@ -79,6 +80,40 @@
                     </div>
                     <div class="btn-group" role="group">
                         <label class="btn btn-primary" ng-model="year" btn-radio="'2010'">
+                            2010
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-2">
+                Comparison Year:
+            </div>
+            <div class="col-lg-10">
+                <div class="btn-group btn-group-justified" role="group">
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-primary" ng-model="comparison_year" btn-radio="false">
+                            None
+                        </label>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-primary" ng-model="comparison_year" ng-disabled="year >= 2007" btn-radio="'2007'">
+                            2007
+                        </label>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-primary" ng-model="comparison_year" ng-disabled="year >= 2008" btn-radio="'2008'">
+                            2008
+                        </label>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-primary" ng-model="comparison_year" ng-disabled="year >= 2009" btn-radio="'2009'">
+                            2009
+                        </label>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <label class="btn btn-primary" ng-model="comparison_year" ng-disabled="year >= 2010" btn-radio="'2010'">
                             2010
                         </label>
                     </div>

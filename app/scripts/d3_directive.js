@@ -27,7 +27,7 @@ angular.module('d3Directives').directive(
                         .attr("height", height);
                 }
 
-                function getDatum(year, enrollment_types, state_full, variable, denominator) {
+                function getDatum(year, enrollment_types, state_full, variable, denominator, comparison_year) {
                     if (!cms_data) {
                         console.error("cms data not loaded");
                         return 0.0;
@@ -73,40 +73,56 @@ angular.module('d3Directives').directive(
                         output /= total_enrolled;
                     }
 
-                    return (output);
+                    if (comparison_year) {
+                        var comparison_datum = getDatum(comparison_year, enrollment_types, state_full, variable, denominator, false);
+                        return (comparison_datum - output);
+                    } else {
+                        return (output);
+                    }
                 }
 
-                function getAllForVariable(year, enrollment_types, variable, denominator) {
+                function getAllForVariable(year, enrollment_types, variable, denominator, comparison_year) {
                     var states = d3.keys(data.state_name_map);
                     var output = [];
                     for (var i = 0; i < states.length; i++) {
-                        output.push(getDatum(year, enrollment_types, states[i], variable, denominator));
+                        output.push(getDatum(year, enrollment_types, states[i], variable, denominator, comparison_year));
                     }
                     return output;
                 }
 
-                function getNationalTotal(year, enrollment_types, variable) {
+                function getNationalTotal(year, enrollment_types, variable, comparison_year) {
                     var states = d3.keys(data.state_name_map);
                     var output = [];
                     for (var i = 0; i < states.length; i++) {
                         output.push(getDatum(year, enrollment_types, states[i], variable, false));
                     }
-                    return d3.sum(output);
+                    if (comparison_year) {
+                        return getNationalTotal(comparison_year, enrollment_types, variable, false) - d3.sum(output);
+                    } else {
+                        return d3.sum(output);
+                    }
                 }
 
-                function render(year, variable, selected_enrollment_types, denominator) {
+                function render(year, variable, selected_enrollment_types, denominator, comparison_year) {
                     if (!scope.$parent.loaded || !cms_data || !us_states) {
                         console.error("Cannot render, data not loaded");
                         return;
                     }
 
-                    var all_values = getAllForVariable(year, selected_enrollment_types, variable, denominator);
+                    var all_values = getAllForVariable(year, selected_enrollment_types, variable, denominator, comparison_year);
 
                     console.log("Range is " + d3.extent(all_values));
 
                     var color = d3.scale.linear()
-                        .domain(d3.extent(all_values))
-                        .range(["#F7FBFF", "#08306B"]);
+                        .interpolate(d3.interpolateHcl);;
+
+                    if (comparison_year) {
+                        color = color.range(["#4575B4", "#FFFFBF", "#A50026"])
+                            .domain([d3.min(all_values), d3.median(all_values), d3.max(all_values)]);
+                    } else {
+                        color = color.range(["#F7FBFF", "#08306B"])
+                            .domain(d3.extent(all_values));
+                    }
 
                     var scale = d3.scale.linear()
                         .domain(d3.extent(all_values))
@@ -120,31 +136,41 @@ angular.module('d3Directives').directive(
 
                     if (denominator) {
                         if (/dollar/i.test(variable) || /payment/i.test(variable)) {
-                            format = d3.format("$.3s");
-                            long_format = d3.format("$.3s");
-                            total_format = d3.format("$,r")
+                            format = "$.3s";
+                            long_format = ("$.3s");
+                            total_format = ("$,r")
                         } else if (/admission/i.test(variable) || /days/i.test(variable) || /visits/i.test(variable)) {
-                            format = d3.format("4s");
-                            long_format = d3.format(".2f");
-                            total_format = d3.format(",r");
+                            format = ("4s");
+                            long_format = (".2f");
+                            total_format = (",r");
                         } else {
-                            format = d3.format(".2%");
-                            long_format = d3.format(".2%");
-                            total_format =  d3.format(",r");
+                            format = (".2%");
+                            long_format = (".2%");
+                            total_format =  (",r");
                         }
                     } else if (/number/i.test(variable) || /count/i.test(variable)) {
-                        format = d3.format("4s");
-                        long_format = d3.format(",r");
-                        total_format =  d3.format(",r");
+                        format = ("4s");
+                        long_format = (",r");
+                        total_format =  (",r");
                     } else if (/dollar/i.test(variable) || /payment/i.test(variable)) {
-                        format = d3.format("$.3s");
-                        long_format = d3.format("$,r");
-                        total_format =  d3.format("$,r");
+                        format = ("$.3s");
+                        long_format = ("$,r");
+                        total_format =  ("$,r");
                     } else {
-                        format = d3.format("");
-                        long_format = d3.format(",.2f");
-                        total_format =  d3.format(",r");
+                        format = ("");
+                        long_format = (",.2f");
+                        total_format =  (",r");
                     }
+
+                    if (comparison_year) {
+                        format = "+" + format;
+                        long_format = "+" + long_format;
+                        total_format = "+" + total_format;
+                    }
+
+                    format = d3.format(format);
+                    long_format = d3.format(long_format);
+                    total_format = d3.format(total_format);
 
                     var xAxis = d3.svg.axis()
                             .scale(scale)
@@ -203,8 +229,11 @@ angular.module('d3Directives').directive(
                         .attr("x", 250)
                         .text(function () {
                             var output = "National Total: " +
-                            total_format(
-                                Math.round(getNationalTotal(year, selected_enrollment_types, variable)));
+                            total_format(Math.round(
+                                    getNationalTotal(year,
+                                        selected_enrollment_types,
+                                        variable,
+                                        comparison_year)));
 
                             return output;
                         });
@@ -219,22 +248,31 @@ angular.module('d3Directives').directive(
                         .append("path")
                         .attr("tooltip", function (d) {
                             var out = d.properties.name + " " + variable;
-                            var number;
+                            var display_number;
+                            var datum = getDatum(year,
+                                        selected_enrollment_types,
+                                        d.properties.name,
+                                        variable,
+                                        denominator,
+                                        comparison_year);
                             if (denominator) {
                                 out += " per " + denominator;
-                                number = long_format(getDatum(year, selected_enrollment_types,
-                                    d.properties.name, variable, denominator));
+                                display_number = long_format(datum);
                             } else {
-                                number = long_format(Math.round(getDatum(year, selected_enrollment_types,
-                                    d.properties.name, variable, denominator)));
+                                display_number = long_format(Math.round(datum));
                             }
                             out += ": ";
-                            return out + number;
+                            return (out + display_number).replace(/-/g, String.fromCharCode(8209));
                         })
                         .attr("tooltip-append-to-body", true)
                         .attr("fill", function (d) {
-                            return color(getDatum(year, selected_enrollment_types,
-                                d.properties.name, variable, denominator));
+                            return color(
+                                getDatum(year,
+                                    selected_enrollment_types,
+                                    d.properties.name,
+                                    variable,
+                                    denominator,
+                                    comparison_year));
                         })
                         .attr("d", path);
 
@@ -261,10 +299,11 @@ angular.module('d3Directives').directive(
                     render(scope.$parent.year.slice(),
                         scope.$parent.variable.slice(),
                         getEnrollmentTypesAsArray(scope.$parent.enrollment_types).slice(),
-                        scope.$parent.denominator);
+                        scope.$parent.denominator,
+                        scope.$parent.comparison_year);
                 }
 
-                var watches = ['variable', 'year', 'enrollment_types', 'denominator', 'loaded'];
+                var watches = ['variable', 'year', 'enrollment_types', 'denominator', 'loaded', 'comparison_year'];
 
                 for (var i = 0; i < watches.length; i++) {
                     scope.$watch(watches[i],
