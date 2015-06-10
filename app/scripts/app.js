@@ -17,40 +17,64 @@ var App = angular.module('App', ['d3Directives', 'ngRoute', 'ui.bootstrap', 'dro
     }]);
 
 
-App.controller('MapController', ['$scope', '$timeout', 'queue', 'd3',
-    function ($scope, $timeout, queue, d3) {
+App.controller('MapController', ['$scope', '$timeout', 'queue', 'd3', '$routeParams', '$location',
+    function ($scope, $timeout, queue, d3, $routeParams, $location) {
+        var route_vars = ['variable', 'year', 'comparison_year', 'denominator'];
+        var defaults = ["Total Medicare IP Hospital FFS payments", "2006", false, false];
+
         $scope.variable_categories = {};
         $scope.categories_show = {};
+        $scope.column_names = [];
         $scope.loaded = false;
-        d3.json("app/static/variable_categories.json", function(data) {
+
+        d3.json("app/static/variable_categories.json", function (data) {
             $scope.variable_categories = data;
             var arr = d3.keys(data);
-            for (var i = 0; i<arr.length; i++) {
+            for (var i = 0; i < arr.length; i++) {
                 $scope.categories_show[arr[i]] = false;
             }
             $scope.loaded = true;
             $scope.$digest();
+
         });
-        $scope.variable = "Total Medicare IP Hospital FFS payments";
-        $scope.column_names = [];
-        $scope.year = "2006";
-        $scope.comparison_year = false;
-        $scope.enrollment_types = {
-            'Full Benefit': true,
-            'Partial Benefit': false,
-            'Medicare Only': false,
-            'Medicaid Only (Disability)': false
-        };
-        $scope.denominator = false;
 
-        $scope.setvar = function(v) {
+        function initializeFromRoute() {
+            for (var i = 0; i < route_vars.length; i++) {
+                if (typeof $routeParams[route_vars[i]] !== 'undefined') {
+                    $scope[route_vars[i]] = $routeParams[route_vars[i]];
+                } else {
+                    $scope[route_vars[i]] = defaults[i];
+                }
+            }
+
+            $scope.enrollment_types = {
+                'Full Benefit': $routeParams.full_benefit ? true : true,
+                'Partial Benefit': $routeParams.partial_benefit ? true : false,
+                'Medicare Only': $routeParams.medicare_only ? true : false,
+                'Medicaid Only (Disability)': $routeParams.medicaid_only ? true : false
+            };
+        }
+
+        $scope.setvar = function (v) {
             $scope.variable = v;
+            updateUrl();
         };
 
-        $scope.toggle_category = function(category) {
+        $scope.toggle_category = function (category) {
             $scope.categories_show[category] = !$scope.categories_show[category];
         };
 
+        function updateUrl() {
+            for (var i = 0; i < route_vars.length; i++) {
+                $location.search(route_vars[i], $scope[route_vars[i]]);
+            }
+            $location.search('full_benefit', $scope.enrollment_types['Full Benefit']);
+            $location.search('partial_benefit', $scope.enrollment_types['Partial Benefit']);
+            $location.search('medicare_only', $scope.enrollment_types['Medicare Only']);
+            $location.search('medicaid_only', $scope.enrollment_types['Medicaid Only (Disability)']);
+        }
+
+        initializeFromRoute();
     }
 ]);
 
@@ -58,7 +82,8 @@ App.config(['$routeProvider', function ($routeProvider) {
     $routeProvider
         .when('/', {
             templateUrl: 'app/views/map.html',
-            controller: 'MapController'
+            controller: 'MapController',
+            reloadOnSearch: false
         });
 }]);
 
