@@ -79,11 +79,17 @@ def load_sheet(sheet):
 
     for col in df.keys().tolist():
         if 'percent' in col.lower():
-            df[re.sub("[Pp]ercent", "Number", col)] = df['Number of People'] * df[col]
+            new_col_name = re.sub("[Pp]ercent", "Number", col)
+            if 'ffs males' in col.lower():
+                df[new_col_name] = df['Number of Males with FFS'] * df[col]
+            elif 'ffs females' in col.lower():
+                df[new_col_name] = df['Number of Females with FFS'] * df[col]
+            elif 'ffs' in col.lower():
+                df[new_col_name] = df['Number of People with FFS'] * df[col]
+            else:
+                df[new_col_name] = df['Number of People'] * df[col]
             del df[col]
-
     output = {}
-
 
     for t in TYPES:
         slice = df.xs(t, level='Number of People by Medicare-Medicaid Enrollment Type')

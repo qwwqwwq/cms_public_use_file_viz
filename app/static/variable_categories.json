@@ -51,7 +51,8 @@
   "Count of FFS Acute IP Hospital Admissions - Medicare and Medicaid combined", 
   "Total FFS dollars (Medicare and Medicaid) associated with IP hospital admissions", 
   "Count of FFS Acute IP Hospital 30-day Readmissions - Medicare and Medicaid combined", 
-  "Count of FFS ED Visits - Medicare and Medicaid combined",
+  "FFS Readmission Rate (% of admissions that are readmissions)", 
+  "Count of FFS ED Visits - Medicare and Medicaid combined", 
   "ED Visits per 1,000 FFS enrollees", 
   "Number with at least one Medicare or Medicaid Nursing Facility or non Facility-based Long-term Care Service (claim or assessment)", 
   "Number with at least one Medicare or Medicaid Residential Mental Health service", 
@@ -217,5 +218,11 @@
   "Number of FFS males with prostate cancer", 
   "Number of FFS males with benign prostatic hyperplasia", 
   "Number of FFS people with depression (any instance including bipolar episodes)"
+ ], 
+ "Denominators": [
+  "Number of People", 
+  "Number of People with FFS", 
+  "Number of Females with FFS", 
+  "Number of Males with FFS"
  ]
 }

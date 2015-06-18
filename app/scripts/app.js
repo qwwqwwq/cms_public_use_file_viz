@@ -93,15 +93,15 @@ App.controller('MapController', ['$scope', '$timeout', 'queue', 'd3', '$routePar
 
         $scope.presets = [
             {
-                title: 'Home Health Care Payments Increasing in Middle America',
-                variable: 'Total Medicare home health FFS payments',
+                title: 'New Hampshire is an Outlier for Fee for Service Payments',
+                variable: 'Total FFS dollars (Medicare and Medicaid) associated with IP hospital admissions',
                 year: '2006', comparison_year: '2010',
                 denominator: 'Number of People with FFS',
                 enrollment_types: {
                     'Full Benefit': true,
                     'Partial Benefit': true,
                     'Medicare Only': true,
-                    'Medicaid Only (Disability)': false
+                    'Medicaid Only (Disability)': true
                 }
             },
             {
@@ -116,6 +116,30 @@ App.controller('MapController', ['$scope', '$timeout', 'queue', 'd3', '$routePar
                     'Medicaid Only (Disability)': false
                 }
             },
+            {
+                title: 'East Coast Has Higher Rates of Hypertension',
+                variable: 'Number of FFS people with hypertension',
+                year: '2010', comparison_year: false,
+                denominator: 'Number of People with FFS',
+                enrollment_types: {
+                    'Full Benefit': true,
+                    'Partial Benefit': true,
+                    'Medicare Only': true,
+                    'Medicaid Only (Disability)': true
+                }
+            },
+            {
+                title: 'Virginia is an Outlier for Readmission Rates',
+                variable: 'Count of FFS Acute IP Hospital 30-day Readmissions - Medicare and Medicaid combined',
+                year: '2010', comparison_year: false,
+                denominator: 'Number of People with FFS',
+                enrollment_types: {
+                    'Full Benefit': true,
+                    'Partial Benefit': true,
+                    'Medicare Only': true,
+                    'Medicaid Only (Disability)': true
+                }
+            }
         ];
 
         $scope.setFromPreset = function (settings) {
@@ -125,7 +149,26 @@ App.controller('MapController', ['$scope', '$timeout', 'queue', 'd3', '$routePar
                 }
             }
             $scope.$digest();
-        }
+        };
+
+        $scope.variableFFS = function () {
+            return $scope.variable.toLowerCase().indexOf('ffs') > -1 &&
+                $scope.variable.toLowerCase().indexOf('ffs males') == -1 &&
+                $scope.variable.toLowerCase().indexOf('ffs females') == -1;
+
+        };
+
+        $scope.variableFFSFemales = function () {
+            return $scope.variable.toLowerCase().indexOf('ffs females') > -1;
+        };
+
+        $scope.variableFFSMales = function () {
+            return $scope.variable.toLowerCase().indexOf('ffs males') > -1;
+        };
+
+        $scope.variableNumberOfPeople = function () {
+            return $scope.variable.toLowerCase().indexOf('ffs') == -1;
+        };
     }
 ]);
 

@@ -1,7 +1,8 @@
 <div ng-controller="MapController">
     <div class="container">
         <div class="row">
-            <h2 class="bg-info">Medicare-Medicaid Linked Enrollee Analytic Data Source (MMLEADS) <br>Version 2.0 Public Use
+            <h2 class="bg-info">Medicare-Medicaid Linked Enrollee Analytic Data Source (MMLEADS) <br>Version 2.0 Public
+                Use
                 File (PUF) Visualization</h2>
             <br>
 
@@ -99,22 +100,26 @@
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="comparison_year" ng-disabled="year >= 2007" btn-radio="'2007'">
+                        <label class="btn btn-primary" ng-model="comparison_year" ng-disabled="year >= 2007"
+                               btn-radio="'2007'">
                             2007
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="comparison_year" ng-disabled="year >= 2008" btn-radio="'2008'">
+                        <label class="btn btn-primary" ng-model="comparison_year" ng-disabled="year >= 2008"
+                               btn-radio="'2008'">
                             2008
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="comparison_year" ng-disabled="year >= 2009" btn-radio="'2009'">
+                        <label class="btn btn-primary" ng-model="comparison_year" ng-disabled="year >= 2009"
+                               btn-radio="'2009'">
                             2009
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="comparison_year" ng-disabled="year >= 2010" btn-radio="'2010'">
+                        <label class="btn btn-primary" ng-model="comparison_year" ng-disabled="year >= 2010"
+                               btn-radio="'2010'">
                             2010
                         </label>
                     </div>
@@ -168,34 +173,43 @@
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="denominator" btn-radio="'Number of People'">
+                        <label class="btn btn-primary" ng-model="denominator" btn-radio="'Number of People'"
+                               ng-disabled="!variableNumberOfPeople()">
                             Total # Enrolled
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="denominator" btn-radio="'Number of People with FFS'">
+                        <label class="btn btn-primary" ng-model="denominator" btn-radio="'Number of People with FFS'"
+                               ng-disabled="!variableFFS()">
                             # of People with FFS
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="denominator" btn-radio="'Number of Females with FFS'">
+                        <label class="btn btn-primary" ng-model="denominator" btn-radio="'Number of Females with FFS'"
+                               ng-disabled="!variableFFSFemales()">
                             # of Females with FFS
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="denominator" btn-radio="'Number of Males with FFS'">
+                        <label class="btn btn-primary" ng-model="denominator" btn-radio="'Number of Males with FFS'"
+                               ng-disabled="!variableFFSMales()">
                             # of Males with FFS
                         </label>
                     </div>
                 </div>
             </div>
         </div>
+        <br>
         <div class="row">
-            <ul>
+            <div class="col-lg-2">
                 <strong>Interesting Reports</strong>
-                <li ng-repeat="settings in presets" ng-click="setFromPreset(settings)">
-                    <a href="">{{settings.title}}</a></li>
-            </ul>
+            </div>
+            <div class="col-lg-10">
+                <ul>
+                    <li ng-repeat="settings in presets" ng-click="setFromPreset(settings)">
+                        <a href="">{{settings.title}}</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>

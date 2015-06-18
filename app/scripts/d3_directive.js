@@ -7,6 +7,7 @@ angular.module('d3Directives').directive(
             restrict: 'EA',
             scope: true,
             link: function (scope, element, attr) {
+                
                 var width = 1160,
                     height = 690,
                     us_states = false,
