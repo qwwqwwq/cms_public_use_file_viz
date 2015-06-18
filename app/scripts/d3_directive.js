@@ -7,9 +7,9 @@ angular.module('d3Directives').directive(
             restrict: 'EA',
             scope: true,
             link: function (scope, element, attr) {
-                
-                var width = 1160,
-                    height = 690,
+
+                var width = parseInt(d3.select("d3_map").style("width")),
+                    height = parseInt(d3.select("d3_map").style("height")),
                     us_states = false,
                     cms_data = false;
 
