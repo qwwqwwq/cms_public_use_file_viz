@@ -17,8 +17,8 @@ var App = angular.module('App', ['d3Directives', 'ngRoute', 'ui.bootstrap', 'dro
     }]);
 
 
-App.controller('MapController', ['$scope', '$timeout', 'queue', 'd3', '$routeParams', '$location',
-    function ($scope, $timeout, queue, d3, $routeParams, $location) {
+App.controller('MapController', ['$scope', '$timeout', 'queue', 'd3', '$routeParams', '$location', '$route',
+    function ($scope, $timeout, queue, d3, $routeParams, $location, $route) {
         var route_vars = ['variable', 'year', 'comparison_year', 'denominator'];
         var defaults = ["Total Medicare IP Hospital FFS payments", "2006", false, false];
 
@@ -26,6 +26,7 @@ App.controller('MapController', ['$scope', '$timeout', 'queue', 'd3', '$routePar
         $scope.categories_show = {};
         $scope.column_names = [];
         $scope.loaded = false;
+        $scope.initialized = false;
 
         d3.json("app/static/variable_categories.json", function (data) {
             $scope.variable_categories = data;
@@ -35,8 +36,15 @@ App.controller('MapController', ['$scope', '$timeout', 'queue', 'd3', '$routePar
             }
             $scope.loaded = true;
             $scope.$digest();
-
         });
+
+        $scope.$on('$routeChangeSuccess', function () {
+            if (!$scope.initialized) {
+                initializeFromRoute();
+            }
+        });
+
+        $scope.$on('mapRender', updateUrl);
 
         function initializeFromRoute() {
             for (var i = 0; i < route_vars.length; i++) {
@@ -53,11 +61,11 @@ App.controller('MapController', ['$scope', '$timeout', 'queue', 'd3', '$routePar
                 'Medicare Only': $routeParams.medicare_only ? true : false,
                 'Medicaid Only (Disability)': $routeParams.medicaid_only ? true : false
             };
+            $scope.$digest();
         }
 
         $scope.setvar = function (v) {
             $scope.variable = v;
-            updateUrl();
         };
 
         $scope.toggle_category = function (category) {
@@ -74,16 +82,62 @@ App.controller('MapController', ['$scope', '$timeout', 'queue', 'd3', '$routePar
             $location.search('medicaid_only', $scope.enrollment_types['Medicaid Only (Disability)']);
         }
 
-        initializeFromRoute();
+
+        var watches = ['variable', 'year', 'enrollment_types', 'denominator', 'loaded', 'comparison_year'];
+
+        for (var i = 0; i < watches.length; i++) {
+            $scope.$watch(watches[i],
+                updateUrl,
+                true);
+        }
+
+        $scope.presets = [
+            {
+                title: 'Home Health Care Payments Increasing in Middle America',
+                variable: 'Total Medicare home health FFS payments',
+                year: '2006', comparison_year: '2010',
+                denominator: 'Number of People with FFS',
+                enrollment_types: {
+                    'Full Benefit': true,
+                    'Partial Benefit': true,
+                    'Medicare Only': true,
+                    'Medicaid Only (Disability)': false
+                }
+            },
+            {
+                title: 'Home Health Care Payments Increasing in Middle America',
+                variable: 'Total Medicare home health FFS payments',
+                year: '2006', comparison_year: '2010',
+                denominator: 'Number of People with FFS',
+                enrollment_types: {
+                    'Full Benefit': true,
+                    'Partial Benefit': true,
+                    'Medicare Only': true,
+                    'Medicaid Only (Disability)': false
+                }
+            },
+        ];
+
+        $scope.setFromPreset = function (settings) {
+            for (var property in settings) {
+                if (settings.hasOwnProperty(property) && property != 'title') {
+                    $scope[property] = settings[property];
+                }
+            }
+            $scope.$digest();
+        }
     }
 ]);
 
 App.config(['$routeProvider', function ($routeProvider) {
     $routeProvider
-        .when('/', {
+        .when('/map', {
             templateUrl: 'app/views/map.html',
             controller: 'MapController',
             reloadOnSearch: false
+        })
+        .otherwise({
+            redirectTo: '/map'
         });
 }]);
 

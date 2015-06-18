@@ -193,7 +193,8 @@
         <div class="row">
             <ul>
                 <strong>Interesting Reports</strong>
-                <li><a href="?variable=Total%20Medicare%20home%20health%20FFS%20payments&year=2006&comparison_year=2010&denominator=Number%20of%20People%20with%20FFS&full_benefit&partial_benefit&medicare_only&medicaid_only=false">one report</a></li>
+                <li ng-repeat="settings in presets" ng-click="setFromPreset(settings)">
+                    <a href="">{{settings.title}}</a></li>
             </ul>
         </div>
     </div>
