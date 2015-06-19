@@ -51,5 +51,10 @@ line {
     color: #4575B4;
     color: #FFFFBF;
     color: #A50026;
-
 }
+
+.map-container {
+    height: 80vh;
+}
+
+

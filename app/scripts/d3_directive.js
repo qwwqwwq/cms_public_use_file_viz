@@ -2,27 +2,28 @@
 
 angular.module('d3Directives').directive(
     'd3Map',
-    ['$compile', 'd3', 'queue', 'topojson', 'data', function ($compile, d3, queue, topojson, data) {
+    ['$window', '$compile', 'd3', 'queue', 'topojson', 'data', function ($window, $compile, d3, queue, topojson, data) {
         return {
-            restrict: 'EA',
+            restrict: 'A',
             scope: true,
             link: function (scope, element, attr) {
-
-                var width = parseInt(d3.select("d3_map").style("width")),
-                    height = parseInt(d3.select("d3_map").style("height")),
+                var width = parseInt(d3.select("#map").style("width")),
+                    height = parseInt(d3.select("#map").style("height")),
+                    projectionScaleFactor = 1.9,
                     us_states = false,
-                    cms_data = false;
-
-                var projection = d3.geo.albersUsa()
-                    .scale(1280)
-                    .translate([width / 2, height / 2]);
-
-                var path = d3.geo.path()
-                    .projection(projection);
+                    cms_data = false,
+                    projection, path;
 
                 function initalizeSvg() {
                     d3.select("svg").remove();
-                    return d3.select("d3_map").append("svg")
+                    width = parseInt(d3.select("#map").style("width"));
+                    height = parseInt(d3.select("#map").style("height"));
+                    projection = d3.geo.albersUsa()
+                        .scale(height * projectionScaleFactor)
+                        .translate([width / 2, height / 2]);
+                    path = d3.geo.path()
+                        .projection(projection);
+                    return d3.select("#map").append("svg")
                         .remove()
                         .attr("width", width)
                         .attr("height", height);
@@ -110,12 +111,14 @@ angular.module('d3Directives').directive(
                         return;
                     }
 
+                    var svg = initalizeSvg();
+
                     var all_values = getAllForVariable(year, selected_enrollment_types, variable, denominator, comparison_year);
 
                     console.log("Range is " + d3.extent(all_values));
 
                     var color = d3.scale.linear()
-                        .interpolate(d3.interpolateHcl);;
+                        .interpolate(d3.interpolateHcl);
 
                     if (comparison_year) {
                         color = color.range(["#4575B4", "#FFFFBF", "#A50026"])
@@ -127,9 +130,7 @@ angular.module('d3Directives').directive(
 
                     var scale = d3.scale.linear()
                         .domain(d3.extent(all_values))
-                        .range([250, 900]);
-
-                    var svg = initalizeSvg();
+                        .range([(0.2 * width), (0.75 * width)]);
 
                     var format;
                     var long_format;
@@ -176,7 +177,7 @@ angular.module('d3Directives').directive(
                     var xAxis = d3.svg.axis()
                             .scale(scale)
                             .orient("bottom")
-                            .tickSize(13)
+                            .tickSize(0.02 * height)
                             .tickFormat(format);
 
                     function pair(array) {
@@ -187,14 +188,14 @@ angular.module('d3Directives').directive(
 
                     var legend = svg.append("g")
                         .attr("class", "legend")
-                        .attr("transform", "translate(0," + (height - 40) + ")");
+                        .attr("transform", "translate(0," + (height - (0.06 * height)) + ")");
 
                     // legend
                     legend.selectAll("rect")
                         .append("g")
                         .data(pair([d3.min(all_values)].concat(scale.ticks(10)).concat([d3.max(all_values)])))
                         .enter().append("rect")
-                        .attr("height", 8)
+                        .attr("height", (0.01 * height))
                         .attr("x", function (d) {
                             return scale(d[0]);
                         })
@@ -209,8 +210,9 @@ angular.module('d3Directives').directive(
                     legend.call(xAxis)
                         .append("text")
                         .attr("class", "caption")
-                        .attr("y", -30)
-                        .attr("x", 250)
+                        .attr("y", (-0.04 * height))
+                        .attr("x", (0.2 * width))
+                        .attr("font-size", Math.round(height / 40) + "px")
                         .text(function () {
                             var output;
                             if (denominator) {
@@ -226,8 +228,9 @@ angular.module('d3Directives').directive(
                     legend.call(xAxis)
                         .append("text")
                         .attr("class", "caption")
-                        .attr("y", -12)
-                        .attr("x", 250)
+                        .attr("y", (-0.015 * height))
+                        .attr("x", (0.2 * width))
+                        .attr("font-size", Math.round(height / 40) + "px")
                         .text(function () {
                             var output;
                             if (comparison_year) {
@@ -243,9 +246,13 @@ angular.module('d3Directives').directive(
                                         comparison_year)));
                         });
 
+                    legend
+                        .selectAll(".tick > text")
+                        .style("font-size", Math.round(height / 50) + "px");
+
                     // map
                     svg.append("g")
-                        .attr("transform", "translate(0,-50)")
+                        .attr("transform", "translate(0,"+ (-0.07 * height) + ")")
                         .attr("class", "states")
                         .selectAll("path")
                         .data(topojson.feature(us_states, us_states.objects.states).features)
@@ -313,11 +320,13 @@ angular.module('d3Directives').directive(
                 for (var i = 0; i < watches.length; i++) {
                     scope.$watch(watches[i],
                         function (newValues, oldValues, scope) {
-                            console.log(newValues);
-                            console.log(oldValues);
                             renderFromScope();
                         }, true);
                 }
+
+                angular.element($window).bind('resize', function() {
+                   renderFromScope();
+                });
 
                 queue()
                     .defer(d3.json, "app/static/us_states.json")
