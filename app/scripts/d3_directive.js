@@ -131,7 +131,7 @@ angular.module('d3Directives').directive(
 
                     var scale = d3.scale.linear()
                         .domain(d3.extent(all_values))
-                        .range([(0.01 * width), (0.99 * width)]);
+                        .range([(0.05 * width), (0.95 * width)]);
 
                     var format;
                     var long_format;
@@ -212,7 +212,7 @@ angular.module('d3Directives').directive(
                         .append("text")
                         .attr("class", "caption")
                         .attr("y", (-0.04 * height))
-                        .attr("x", (0.01 * width))
+                        .attr("x", (0.05 * width))
                         .attr("font-size", Math.round(height / 40) + "px")
                         .text(function () {
                             var output;
@@ -230,7 +230,7 @@ angular.module('d3Directives').directive(
                         .append("text")
                         .attr("class", "caption")
                         .attr("y", (-0.015 * height))
-                        .attr("x", (0.01 * width))
+                        .attr("x", (0.05 * width))
                         .attr("font-size", Math.round(height / 40) + "px")
                         .text(function () {
                             var output;

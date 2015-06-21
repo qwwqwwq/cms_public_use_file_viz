@@ -127,7 +127,7 @@ line {
 
 div.map-aspect {
     width: 100%;
-    padding-bottom: 69%; /* 16:9 */
+    padding-bottom: 69%;
     position: relative;
     background: #f5f5f5;
     border-radius: 5px;
@@ -137,7 +137,6 @@ div.map-aspect {
 div.map-aspect > div {
     position: absolute;
     top: 0; bottom: 0; left: 0; right: 0;
-    color: white;
     font-size: 24px;
     text-align: center;
 }

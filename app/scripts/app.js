@@ -8,7 +8,7 @@ angular.module('d3Directives', ['d3', 'queue', 'topojson', 'ui.bootstrap', 'data
 angular.module('dropdownDirective', []);
 
 
-var App = angular.module('App', ['d3Directives', 'ngRoute', 'ui.bootstrap', 'dropdownDirective'])
+var App = angular.module('App', ['d3Directives', 'ngRoute', 'ui.bootstrap', 'dropdownDirective', 'angular-loading-bar'])
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider
             .otherwise({
