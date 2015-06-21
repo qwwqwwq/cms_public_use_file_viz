@@ -10,6 +10,7 @@ angular.module('d3Directives').directive(
                 var width = parseInt(d3.select("#map").style("width")),
                     height = parseInt(d3.select("#map").style("height")),
                     projectionScaleFactor = 1.9,
+                    projectionScaleFactorX = 1.275,
                     us_states = false,
                     cms_data = false,
                     projection, path;
@@ -19,8 +20,8 @@ angular.module('d3Directives').directive(
                     width = parseInt(d3.select("#map").style("width"));
                     height = parseInt(d3.select("#map").style("height"));
                     projection = d3.geo.albersUsa()
-                        .scale(height * projectionScaleFactor)
-                        .translate([width / 2, height / 2]);
+                        .scale(width * projectionScaleFactorX)
+                        .translate([(width / 2) + (0.03 * width), (height / 2) - (0.075 * height)]);
                     path = d3.geo.path()
                         .projection(projection);
                     return d3.select("#map").append("svg")
@@ -130,7 +131,7 @@ angular.module('d3Directives').directive(
 
                     var scale = d3.scale.linear()
                         .domain(d3.extent(all_values))
-                        .range([(0.2 * width), (0.75 * width)]);
+                        .range([(0.01 * width), (0.99 * width)]);
 
                     var format;
                     var long_format;
@@ -211,7 +212,7 @@ angular.module('d3Directives').directive(
                         .append("text")
                         .attr("class", "caption")
                         .attr("y", (-0.04 * height))
-                        .attr("x", (0.2 * width))
+                        .attr("x", (0.01 * width))
                         .attr("font-size", Math.round(height / 40) + "px")
                         .text(function () {
                             var output;
@@ -229,7 +230,7 @@ angular.module('d3Directives').directive(
                         .append("text")
                         .attr("class", "caption")
                         .attr("y", (-0.015 * height))
-                        .attr("x", (0.2 * width))
+                        .attr("x", (0.01 * width))
                         .attr("font-size", Math.round(height / 40) + "px")
                         .text(function () {
                             var output;
@@ -250,9 +251,9 @@ angular.module('d3Directives').directive(
                         .selectAll(".tick > text")
                         .style("font-size", Math.round(height / 50) + "px");
 
+
                     // map
                     svg.append("g")
-                        .attr("transform", "translate(0,"+ (-0.07 * height) + ")")
                         .attr("class", "states")
                         .selectAll("path")
                         .data(topojson.feature(us_states, us_states.objects.states).features)
@@ -276,6 +277,7 @@ angular.module('d3Directives').directive(
                             out += ": ";
                             return (out + display_number).replace(/-/g, String.fromCharCode(8209));
                         })
+                        .attr("tooltip-class", "responsive-text")
                         .attr("tooltip-append-to-body", true)
                         .attr("fill", function (d) {
                             return color(

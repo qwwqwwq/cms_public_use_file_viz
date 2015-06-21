@@ -1,51 +1,59 @@
 <div ng-controller="MapController">
     <div class="container">
         <div class="row">
-            <h2 class="bg-info">Medicare-Medicaid Linked Enrollee Analytic Data Source (MMLEADS) <br>Version 2.0 Public
-                Use
-                File (PUF) Visualization</h2>
-            <br>
-
-            <p class="lead responsive-text-lg">
-                On 4/23/15 the Centers for Medicare & Medicade Services released a public-use file containing
-                information on eligibility, enrollment, cost, use, and select health and mental health conditions for
-                Medicare and Medicaid enrollees from all states from 2006 to 2010.
-                <br><br>
-                Below is a visualization of the data found in that file. The purpose of this visualization is to make
-                this important data easier to comprehend.
-                <br><br>
-                Be advised there may be some skew where numbers given only as percentages
-                in the public-use file were translated to whole numbers. Numbers censored for anonymization purposes
-                are represented as 0 for the purposes of this visualization.
-                <br><br>
-                The original file can be downloaded in Excel format <a
-                    href="http://www.cms.gov/Medicare-Medicaid-Coordination/Medicare-and-Medicaid-Coordination/Medicare-Medicaid-Coordination-Office/Downloads/MMLEADSPUFTablesExcel.zip">here</a>.
-            </p>
-        </div>
-        <div class="row">
-            <div class="col-xs-12 text-center">
-                <div id="map" class="map-container" d3_map></div>
+            <div class="col-xs-12">
+                <h2 class="bg-info responsive-text-title page-title">
+                    Medicare-Medicaid Linked Enrollee Analytic Data Source
+                    (MMLEADS) Version 2.0 Public Use File (PUF) Visualization
+                </h2>
+                <p class="responsive-text-lg">
+                    On 4/23/15 the Centers for Medicare & Medicade Services released a public-use file containing
+                    information on eligibility, enrollment, cost, use, and select health and mental health conditions
+                    for
+                    Medicare and Medicaid enrollees from all states from 2006 to 2010.
+                    <br><br>
+                    Below is a visualization of the data found in that file. The purpose of this visualization is to
+                    make
+                    this important data easier to comprehend.
+                    <br><br>
+                    Be advised there may be some skew where numbers given only as percentages
+                    in the public-use file were translated to whole numbers. Numbers censored for anonymization purposes
+                    are represented as 0 for the purposes of this visualization.
+                    <br><br>
+                    The original file can be downloaded in Excel format <a
+                        href="http://www.cms.gov/Medicare-Medicaid-Coordination/Medicare-and-Medicaid-Coordination/Medicare-Medicaid-Coordination-Office/Downloads/MMLEADSPUFTablesExcel.zip">here</a>.
+                </p>
             </div>
         </div>
         <div class="row">
-            <div class="col-xs-2 responsive-text">
-                Choose Variable:
+            <div class="col-xs-12 text-center">
+                <div class="map-aspect">
+                    <div id="map" d3_map></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-2 responsive-text button-label text-right">
+                <strong>Choose Variable:</strong>
             </div>
             <div class="col-xs-10">
                 <div class="btn-group btn-group-justified" role="group">
                     <div class="btn-group" role="group">
                         <div dropdown is-open="status.isopen" auto-close="outsideClick">
-                            <button type="button" class="btn btn-primary dropdown-toggle responsive-text" dropdown-toggle>
+                            <button type="button" class="btn btn-primary dropdown-toggle responsive-text"
+                                    dropdown-toggle>
                                 {{variable}}
                                 <span class="caret"></span>
                             </button>
-                            <div class="dropdown-menu big-button" role="menu">
-                                <div ng-repeat="(category, items) in variable_categories">
+                            <div class="dropdown-menu btn-block" role="menu">
+                                <div ng-repeat="(category, items) in variable_categories" class="responsive-text">
                                     <ul class="dropdown-column">
                                         <category ng-click="toggle_category(category)"/>
                                         <li class="divider"></li>
                                         <variable ng-repeat="item in variable_categories[category]"
-                                                  ng-show="categories_show[category]" ng-click="setvar(item)"/>
+                                                  ng-show="categories_show[category]" ng-click="setvar(item)"
+                                                  ng-class="{'hovered-item': item == variable}"
+                                                />
                                     </ul>
                                 </div>
                             </div>
@@ -55,8 +63,8 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-xs-2 responsive-text">
-                Choose Year:
+            <div class="col-xs-2 responsive-text button-label text-right">
+                <strong>Choose Year:</strong>
             </div>
             <div class="col-xs-10">
                 <div class="btn-group btn-group-justified" role="group">
@@ -89,8 +97,8 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-xs-2 responsive-text">
-                Comparison Year:
+            <div class="col-xs-2 responsive-text button-label text-right">
+                <strong>Comparison Year:</strong>
             </div>
             <div class="col-xs-10">
                 <div class="btn-group btn-group-justified" role="group">
@@ -100,25 +108,29 @@
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary responsive-text" ng-model="comparison_year" ng-disabled="year >= 2007"
+                        <label class="btn btn-primary responsive-text" ng-model="comparison_year"
+                               ng-disabled="year >= 2007"
                                btn-radio="'2007'">
                             2007
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary responsive-text" ng-model="comparison_year" ng-disabled="year >= 2008"
+                        <label class="btn btn-primary responsive-text" ng-model="comparison_year"
+                               ng-disabled="year >= 2008"
                                btn-radio="'2008'">
                             2008
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary responsive-text" ng-model="comparison_year" ng-disabled="year >= 2009"
+                        <label class="btn btn-primary responsive-text" ng-model="comparison_year"
+                               ng-disabled="year >= 2009"
                                btn-radio="'2009'">
                             2009
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary responsive-text" ng-model="comparison_year" ng-disabled="year >= 2010"
+                        <label class="btn btn-primary responsive-text" ng-model="comparison_year"
+                               ng-disabled="year >= 2010"
                                btn-radio="'2010'">
                             2010
                         </label>
@@ -127,15 +139,15 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-xs-2 responsive-text">
-                Choose Enrollment(s):
+            <div class="col-sm-2 col-xs-2 responsive-text button-label text-right">
+                <strong>Choose Enrollment(s):</strong>
             </div>
-            <div class="col-xs-10">
+            <div class="col-sm-10 col-xs-10">
                 <div class="btn-group btn-group-justified">
                     <div class="btn-group" role="group">
                         <label class="btn btn-primary responsive-text" ng-model="enrollment_types['Full Benefit']"
                                btn-checkbox>
-                            Full Benefit
+                            Full<br>Benefit
                         </label>
                     </div>
 
@@ -143,71 +155,74 @@
                     <div class="btn-group" role="group">
                         <label class="btn btn-primary responsive-text" ng-model="enrollment_types['Partial Benefit']"
                                btn-checkbox>
-                            Partial Benefit
+                            Partial<br>Benefit
                         </label>
                     </div>
                     <div class="btn-group" role="group">
                         <label class="btn btn-primary responsive-text" ng-model="enrollment_types['Medicare Only']"
                                btn-checkbox>
-                            Medicare Only
+                            Medicare<br>Only
                         </label>
                     </div>
                     <div class="btn-group" role="group">
                         <label class="btn btn-primary responsive-text"
                                ng-model="enrollment_types['Medicaid Only (Disability)']" btn-checkbox>
-                            Medicaid Only (Disability)
+                            Medicaid Only <br> (Disability)
                         </label>
                     </div>
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="col-xs-2 responsive-text">
-                Denominator:
+            <div class="col-sm-2 col-xs-2 responsive-text button-label text-right">
+                <strong>Choose Denominator:</strong>
             </div>
-            <div class="col-xs-10">
+            <div class="col-sm-10 col-xs-10">
                 <div class="btn-group btn-group-justified" role="group">
                     <div class="btn-group" role="group">
                         <label class="btn btn-primary responsive-text" ng-model="denominator" btn-radio="false">
-                            None
+                            None<br>&#8203;
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary responsive-text" ng-model="denominator" btn-radio="'Number of People'"
+                        <label class="btn btn-primary responsive-text" ng-model="denominator"
+                               btn-radio="'Number of People'"
                                ng-disabled="!variableNumberOfPeople()">
-                            Total # Enrolled
+                            Total # <br>Enrolled
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary responsive-text" ng-model="denominator" btn-radio="'Number of People with FFS'"
+                        <label class="btn btn-primary responsive-text" ng-model="denominator"
+                               btn-radio="'Number of People with FFS'"
                                ng-disabled="!variableFFS()">
-                            # of People with FFS
+                            # People <br>with FFS
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary responsive-text" ng-model="denominator" btn-radio="'Number of Females with FFS'"
+                        <label class="btn btn-primary responsive-text" ng-model="denominator"
+                               btn-radio="'Number of Females with FFS'"
                                ng-disabled="!variableFFSFemales()">
-                            # of Females with FFS
+                            # Females <br>with FFS
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary responsive-text" ng-model="denominator" btn-radio="'Number of Males with FFS'"
+                        <label class="btn btn-primary responsive-text" ng-model="denominator"
+                               btn-radio="'Number of Males with FFS'"
                                ng-disabled="!variableFFSMales()">
-                            # of Males with FFS
+                            # Males <br>with FFS
                         </label>
                     </div>
                 </div>
             </div>
         </div>
-        <br>
-        <div class="row">
-            <div class="col-xs-2 responsive-text">
-                <strong>Interesting Reports</strong>
+        <div class="row interesting-reports">
+            <div class="col-xs-2 responsive-text button-label text-right">
+                Interesting Reports:
             </div>
             <div class="col-xs-10 responsive-text">
                 <ul>
                     <li ng-repeat="settings in presets" ng-click="setFromPreset(settings)">
-                        <a href="">{{settings.title}}</a></li>
+                        <a href="" class="responsive-text">{{settings.title}}</a></li>
                 </ul>
             </div>
         </div>

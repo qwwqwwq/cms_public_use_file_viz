@@ -49,7 +49,11 @@ App.controller('MapController', ['$scope', '$timeout', 'queue', 'd3', '$routePar
         function initializeFromRoute() {
             for (var i = 0; i < route_vars.length; i++) {
                 if (typeof $routeParams[route_vars[i]] !== 'undefined') {
-                    $scope[route_vars[i]] = $routeParams[route_vars[i]];
+                    if ($routeParams[route_vars[i]] === 'false') {
+                        $scope[route_vars[i]] = false;
+                    } else {
+                        $scope[route_vars[i]] = $routeParams[route_vars[i]];
+                    }
                 } else {
                     $scope[route_vars[i]] = defaults[i];
                 }
