@@ -6,7 +6,7 @@
                 File (PUF) Visualization</h2>
             <br>
 
-            <p class="lead">
+            <p class="lead responsive-text-lg">
                 On 4/23/15 the Centers for Medicare & Medicade Services released a public-use file containing
                 information on eligibility, enrollment, cost, use, and select health and mental health conditions for
                 Medicare and Medicaid enrollees from all states from 2006 to 2010.
@@ -23,19 +23,19 @@
             </p>
         </div>
         <div class="row">
-            <div class="col-lg-12 text-center">
+            <div class="col-xs-12 text-center">
                 <div id="map" class="map-container" d3_map></div>
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-2">
+            <div class="col-xs-2 responsive-text">
                 Choose Variable:
             </div>
-            <div class="col-lg-10">
+            <div class="col-xs-10">
                 <div class="btn-group btn-group-justified" role="group">
                     <div class="btn-group" role="group">
                         <div dropdown is-open="status.isopen" auto-close="outsideClick">
-                            <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle>
+                            <button type="button" class="btn btn-primary dropdown-toggle responsive-text" dropdown-toggle>
                                 {{variable}}
                                 <span class="caret"></span>
                             </button>
@@ -55,33 +55,33 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-2">
+            <div class="col-xs-2 responsive-text">
                 Choose Year:
             </div>
-            <div class="col-lg-10">
+            <div class="col-xs-10">
                 <div class="btn-group btn-group-justified" role="group">
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="year" btn-radio="'2006'">
+                        <label class="btn btn-primary responsive-text" ng-model="year" btn-radio="'2006'">
                             2006
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="year" btn-radio="'2007'">
+                        <label class="btn btn-primary responsive-text" ng-model="year" btn-radio="'2007'">
                             2007
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="year" btn-radio="'2008'">
+                        <label class="btn btn-primary responsive-text" ng-model="year" btn-radio="'2008'">
                             2008
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="year" btn-radio="'2009'">
+                        <label class="btn btn-primary responsive-text" ng-model="year" btn-radio="'2009'">
                             2009
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="year" btn-radio="'2010'">
+                        <label class="btn btn-primary responsive-text" ng-model="year" btn-radio="'2010'">
                             2010
                         </label>
                     </div>
@@ -89,36 +89,36 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-2">
+            <div class="col-xs-2 responsive-text">
                 Comparison Year:
             </div>
-            <div class="col-lg-10">
+            <div class="col-xs-10">
                 <div class="btn-group btn-group-justified" role="group">
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="comparison_year" btn-radio="false">
+                        <label class="btn btn-primary responsive-text" ng-model="comparison_year" btn-radio="false">
                             None
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="comparison_year" ng-disabled="year >= 2007"
+                        <label class="btn btn-primary responsive-text" ng-model="comparison_year" ng-disabled="year >= 2007"
                                btn-radio="'2007'">
                             2007
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="comparison_year" ng-disabled="year >= 2008"
+                        <label class="btn btn-primary responsive-text" ng-model="comparison_year" ng-disabled="year >= 2008"
                                btn-radio="'2008'">
                             2008
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="comparison_year" ng-disabled="year >= 2009"
+                        <label class="btn btn-primary responsive-text" ng-model="comparison_year" ng-disabled="year >= 2009"
                                btn-radio="'2009'">
                             2009
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="comparison_year" ng-disabled="year >= 2010"
+                        <label class="btn btn-primary responsive-text" ng-model="comparison_year" ng-disabled="year >= 2010"
                                btn-radio="'2010'">
                             2010
                         </label>
@@ -127,13 +127,13 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-2">
+            <div class="col-xs-2 responsive-text">
                 Choose Enrollment(s):
             </div>
-            <div class="col-lg-10">
+            <div class="col-xs-10">
                 <div class="btn-group btn-group-justified">
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="enrollment_types['Full Benefit']"
+                        <label class="btn btn-primary responsive-text" ng-model="enrollment_types['Full Benefit']"
                                btn-checkbox>
                             Full Benefit
                         </label>
@@ -141,19 +141,19 @@
 
 
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="enrollment_types['Partial Benefit']"
+                        <label class="btn btn-primary responsive-text" ng-model="enrollment_types['Partial Benefit']"
                                btn-checkbox>
                             Partial Benefit
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="enrollment_types['Medicare Only']"
+                        <label class="btn btn-primary responsive-text" ng-model="enrollment_types['Medicare Only']"
                                btn-checkbox>
                             Medicare Only
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary"
+                        <label class="btn btn-primary responsive-text"
                                ng-model="enrollment_types['Medicaid Only (Disability)']" btn-checkbox>
                             Medicaid Only (Disability)
                         </label>
@@ -162,36 +162,36 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-2">
+            <div class="col-xs-2 responsive-text">
                 Denominator:
             </div>
-            <div class="col-lg-10">
+            <div class="col-xs-10">
                 <div class="btn-group btn-group-justified" role="group">
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="denominator" btn-radio="false">
+                        <label class="btn btn-primary responsive-text" ng-model="denominator" btn-radio="false">
                             None
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="denominator" btn-radio="'Number of People'"
+                        <label class="btn btn-primary responsive-text" ng-model="denominator" btn-radio="'Number of People'"
                                ng-disabled="!variableNumberOfPeople()">
                             Total # Enrolled
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="denominator" btn-radio="'Number of People with FFS'"
+                        <label class="btn btn-primary responsive-text" ng-model="denominator" btn-radio="'Number of People with FFS'"
                                ng-disabled="!variableFFS()">
                             # of People with FFS
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="denominator" btn-radio="'Number of Females with FFS'"
+                        <label class="btn btn-primary responsive-text" ng-model="denominator" btn-radio="'Number of Females with FFS'"
                                ng-disabled="!variableFFSFemales()">
                             # of Females with FFS
                         </label>
                     </div>
                     <div class="btn-group" role="group">
-                        <label class="btn btn-primary" ng-model="denominator" btn-radio="'Number of Males with FFS'"
+                        <label class="btn btn-primary responsive-text" ng-model="denominator" btn-radio="'Number of Males with FFS'"
                                ng-disabled="!variableFFSMales()">
                             # of Males with FFS
                         </label>
@@ -201,10 +201,10 @@
         </div>
         <br>
         <div class="row">
-            <div class="col-lg-2">
+            <div class="col-xs-2 responsive-text">
                 <strong>Interesting Reports</strong>
             </div>
-            <div class="col-lg-10">
+            <div class="col-xs-10 responsive-text">
                 <ul>
                     <li ng-repeat="settings in presets" ng-click="setFromPreset(settings)">
                         <a href="">{{settings.title}}</a></li>

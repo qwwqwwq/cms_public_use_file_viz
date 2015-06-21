@@ -57,4 +57,36 @@ line {
     height: 80vh;
 }
 
+@media (min-width: 1001px) {
+    .responsive-text {
+        font-size: 14px !important;
+    }
+
+    .responsive-text-lg {
+        font-size: 18px !important;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1000px) {
+    .responsive-text {
+        font-size: 12px !important;
+    }
+
+    .responsive-text-lg {
+        font-size: 16px !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .responsive-text {
+        font-size: 10px !important;
+    }
+
+    .responsive-text-lg {
+        font-size: 14px !important;
+    }
+}
+
+
+
 
