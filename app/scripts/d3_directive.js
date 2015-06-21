@@ -332,7 +332,7 @@ angular.module('d3Directives').directive(
 
                 queue()
                     .defer(d3.json, "app/static/us_states.json")
-                    .defer(d3.json, "app/static/cms_data.json")
+                    .defer(d3.json, "app/static/cms_data.json.gz")
                     .awaitAll(ready);
 
                 function ready(error, data) {
